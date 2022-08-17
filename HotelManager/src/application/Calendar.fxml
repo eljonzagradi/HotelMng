@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="658.0" prefWidth="927.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.CalendarController">
+   <children>
+      <VBox fx:id="view" layoutX="59.0" layoutY="31.0" prefHeight="378.0" prefWidth="535.0" spacing="5.0" AnchorPane.leftAnchor="59.0">
+         <children>
+            <HBox alignment="BOTTOM_CENTER" prefHeight="29.0" prefWidth="553.0">
+               <children>
+                  <Button fx:id="prevMonth" mnemonicParsing="false" onAction="#previousMonth" text="&lt;&lt;" />
+                  <Text fx:id="calendarTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="Month + Year" textAlignment="CENTER" wrappingWidth="222.13671875">
+                     <font>
+                        <Font name="System Bold Italic" size="20.0" />
+                     </font>
+                  </Text>
+                  <Button fx:id="nextMonth" mnemonicParsing="false" onAction="#nextMonth" text="&gt;&gt;" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+            <GridPane fx:id="weekDays" alignment="CENTER" hgap="3.0" prefHeight="25.0" prefWidth="580.0">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints vgrow="SOMETIMES" />
+              </rowConstraints>
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets left="5.0" right="5.0" />
+               </padding>
+               <children>
+                  <Label alignment="BOTTOM_CENTER" prefHeight="18.0" prefWidth="84.0" text="Monday">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="BOTTOM_CENTER" prefHeight="18.0" prefWidth="84.0" text="Tuesday" GridPane.columnIndex="1">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="BOTTOM_CENTER" prefHeight="18.0" prefWidth="84.0" text="Wednesday" GridPane.columnIndex="2">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="BOTTOM_CENTER" prefHeight="18.0" prefWidth="84.0" text="Thursday" GridPane.columnIndex="3">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="BOTTOM_CENTER" prefHeight="18.0" prefWidth="84.0" text="Friday" GridPane.columnIndex="4">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="BOTTOM_CENTER" prefHeight="18.0" prefWidth="84.0" text="Saturday" GridPane.columnIndex="5">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="BOTTOM_CENTER" prefHeight="18.0" prefWidth="84.0" text="Sunday" GridPane.columnIndex="6">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+               </children>
+            </GridPane>
+            <GridPane fx:id="calendar" alignment="CENTER" hgap="3.0" layoutX="55.0" layoutY="249.0" prefHeight="307.0" prefWidth="539.0" vgap="3.0" VBox.vgrow="NEVER">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints vgrow="SOMETIMES" />
+                <RowConstraints vgrow="SOMETIMES" />
+                <RowConstraints vgrow="SOMETIMES" />
+                <RowConstraints vgrow="SOMETIMES" />
+                  <RowConstraints vgrow="SOMETIMES" />
+              </rowConstraints>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets left="5.0" right="5.0" />
+               </padding>
+            </GridPane>
+         </children>
+      </VBox>
+      <TableView fx:id="reservationsTable" layoutX="10.0" layoutY="425.0" prefHeight="220.0" prefWidth="635.0" AnchorPane.leftAnchor="10.0">
+         <columns>
+            <TableColumn fx:id="name_c" editable="false" maxWidth="100.0" minWidth="-1.0" prefWidth="64.0" text="Name" />
+            <TableColumn fx:id="lastname_c" editable="false" maxWidth="131.0" minWidth="-1.0" prefWidth="77.0" text="Last Name" />
+            <TableColumn fx:id="phone_c" editable="false" prefWidth="84.0" text="Tel" />
+            <TableColumn fx:id="checkin_c" editable="false" maxWidth="188.0" minWidth="-1.0" prefWidth="84.0" text="Check-in" />
+            <TableColumn fx:id="checkout_c" editable="false" maxWidth="222.0" minWidth="-1.0" prefWidth="108.0" text="Check-out" />
+            <TableColumn fx:id="totalPrice_c" editable="false" maxWidth="198.0" minWidth="-1.0" prefWidth="95.0" text="Total Price" />
+            <TableColumn fx:id="createdAt_c" editable="false" maxWidth="366.0" minWidth="-1.0" prefWidth="120.0" text="Created At" />
+         </columns>
+      </TableView>
+      <VBox alignment="CENTER" layoutX="693.0" layoutY="105.0" prefHeight="430.0" prefWidth="200.0" spacing="5.0">
+         <children>
+            <Button fx:id="changeRoom_b" mnemonicParsing="false" onAction="#clickChangeRoom" prefHeight="35.0" prefWidth="200.0" text="Change Room">
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Button>
+            <Label fx:id="room_x" alignment="CENTER" prefHeight="40.0" prefWidth="235.0" text="Selected Room">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <HBox prefHeight="40.0" prefWidth="200.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="100.0" text="Name:">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="name_x" alignment="CENTER" prefHeight="40.0" prefWidth="115.0">
+                     <font>
+                        <Font name="System Bold Italic" size="13.0" />
+                     </font>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox prefHeight="40.0" prefWidth="200.0">
+               <children>
+                  <Label contentDisplay="CENTER" prefHeight="40.0" prefWidth="100.0" text="Last Name:" textAlignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="lastName_x" alignment="CENTER" prefHeight="40.0" prefWidth="115.0">
+                     <font>
+                        <Font name="System Bold Italic" size="13.0" />
+                     </font>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox prefHeight="40.0" prefWidth="200.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="62.0" text="Tel.">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="phonenum_x" alignment="CENTER" prefHeight="40.0" prefWidth="140.0">
+                     <font>
+                        <Font name="System Bold Italic" size="13.0" />
+                     </font>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0">
+               <VBox.margin>
+                  <Insets left="2.5" right="2.5" />
+               </VBox.margin>
+               <children>
+                  <Label prefHeight="40.0" prefWidth="80.0" text="Check-in">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="checkin_x" alignment="CENTER" prefHeight="40.0" prefWidth="88.0" promptText="-----&gt;">
+                     <font>
+                        <Font name="System Bold Italic" size="11.0" />
+                     </font>
+                  </TextField>
+                  <ToggleButton fx:id="setCheckin_b" mnemonicParsing="false" prefHeight="47.0" prefWidth="25.0">
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/cld.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></ToggleButton>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0">
+               <opaqueInsets>
+                  <Insets left="2.0" />
+               </opaqueInsets>
+               <VBox.margin>
+                  <Insets left="2.5" right="2.5" />
+               </VBox.margin>
+               <children>
+                  <Label prefHeight="40.0" prefWidth="80.0" text="Check-out">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="checkout_x" alignment="CENTER" prefHeight="40.0" prefWidth="88.0" promptText="-----&gt;">
+                     <font>
+                        <Font name="System Bold Italic" size="11.0" />
+                     </font>
+                  </TextField>
+                  <ToggleButton fx:id="setCheckout_b" layoutX="174.0" layoutY="10.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="25.0">
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/cld.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></ToggleButton>
+               </children>
+            </HBox>
+            <HBox prefHeight="40.0" prefWidth="235.0" spacing="2.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="40.0" text="Price:">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="totalPrice_x" alignment="CENTER" prefHeight="40.0" prefWidth="119.0">
+                     <font>
+                        <Font name="System Bold Italic" size="15.0" />
+                     </font>
+                  </TextField>
+                  <Label prefHeight="40.0" prefWidth="30.0" text="LEK">
+                     <font>
+                        <Font name="System Bold Italic" size="13.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <Button fx:id="addReservation_b" mnemonicParsing="false" onAction="#clickAddReservations" prefHeight="40.0" prefWidth="200.0" text="Add Reservation">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Button>
+            <Label fx:id="errorsDisplay" alignment="CENTER" contentDisplay="CENTER" prefHeight="40.0" prefWidth="200.0" textFill="RED" />
+            <HBox alignment="CENTER" prefHeight="27.0" prefWidth="200.0" spacing="4.0">
+               <children>
+                  <Button fx:id="deleteReservation" mnemonicParsing="false" onAction="#clickDeleteReservation" prefHeight="25.0" prefWidth="63.0" text="Delete" />
+                  <Button mnemonicParsing="false" onAction="#cilckEditReservation" prefHeight="25.0" prefWidth="63.0" text="Modify" />
+                  <Button mnemonicParsing="false" onAction="#clickClear" prefHeight="25.0" prefWidth="63.0" text="Clear" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
