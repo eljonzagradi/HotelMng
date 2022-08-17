@@ -185,7 +185,7 @@
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="checkin_x" alignment="CENTER" prefHeight="40.0" prefWidth="88.0" promptText="-----&gt;">
+                  <TextField fx:id="checkin_x" alignment="CENTER" editable="false" prefHeight="40.0" prefWidth="88.0" promptText="-----&gt;">
                      <font>
                         <Font name="System Bold Italic" size="11.0" />
                      </font>
@@ -213,7 +213,7 @@
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="checkout_x" alignment="CENTER" prefHeight="40.0" prefWidth="88.0" promptText="-----&gt;">
+                  <TextField fx:id="checkout_x" alignment="CENTER" editable="false" prefHeight="40.0" prefWidth="88.0" promptText="-----&gt;">
                      <font>
                         <Font name="System Bold Italic" size="11.0" />
                      </font>
@@ -247,17 +247,18 @@
                   </Label>
                </children>
             </HBox>
-            <Button fx:id="addReservation_b" mnemonicParsing="false" onAction="#clickAddReservations" prefHeight="40.0" prefWidth="200.0" text="Add Reservation">
-               <font>
-                  <Font name="System Bold Italic" size="15.0" />
-               </font>
-            </Button>
+            <HBox alignment="CENTER" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Button fx:id="create_b" mnemonicParsing="false" onAction="#clickAddReservations" prefHeight="41.0" prefWidth="60.0" text="Create" />
+                  <Button fx:id="update_b" alignment="CENTER" mnemonicParsing="false" prefHeight="39.0" prefWidth="60.0" text="Update" />
+                  <Button mnemonicParsing="false" onAction="#clickClear" prefHeight="25.0" prefWidth="60.0" text="Clear" />
+               </children>
+            </HBox>
             <Label fx:id="errorsDisplay" alignment="CENTER" contentDisplay="CENTER" prefHeight="40.0" prefWidth="200.0" textFill="RED" />
             <HBox alignment="CENTER" prefHeight="27.0" prefWidth="200.0" spacing="4.0">
                <children>
                   <Button fx:id="deleteReservation" mnemonicParsing="false" onAction="#clickDeleteReservation" prefHeight="25.0" prefWidth="63.0" text="Delete" />
-                  <Button mnemonicParsing="false" onAction="#cilckEditReservation" prefHeight="25.0" prefWidth="63.0" text="Modify" />
-                  <Button mnemonicParsing="false" onAction="#clickClear" prefHeight="25.0" prefWidth="63.0" text="Clear" />
+                  <ToggleButton fx:id="modify_b" mnemonicParsing="false" text="Modify" />
                </children>
             </HBox>
          </children>
