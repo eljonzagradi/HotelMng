@@ -207,8 +207,10 @@ public class CalendarController implements Initializable {
 			update_b.setDisable(true);
 			create_b.setDisable(false);
 		}
-		
+		temp.clear();
 	    refresh();
+		
+
 	}
 	
 	public void refresh() {
@@ -309,6 +311,30 @@ public class CalendarController implements Initializable {
 			}
 			
 		});
+				
+		reservationsTable.setOnMouseClicked( event -> {
+			
+			setCheckin(null);
+			setCheckout(null);
+			temp.clear();
+
+
+			if(reservationsTable.getSelectionModel().getSelectedItem() != null) {
+				
+				Reservation r =	reservationsTable.getSelectionModel().getSelectedItem();
+				LocalDate start = r.getCheckin().get().toLocalDate();
+				LocalDate end = r.getCheckout().get().toLocalDate();
+				List<LocalDate>	l = start.datesUntil(end)
+						.collect(Collectors.toList());
+				
+				temp.addAll(l);
+				populateCalendar(currentYearMonth);
+				
+			}
+			
+		}
+		
+				);
 		
 		toggleGR.selectedToggleProperty()
 		.addListener((obsVal, oldVal, newVal) -> 
@@ -322,18 +348,20 @@ public class CalendarController implements Initializable {
 		setCheckin_b.setSelected(true);
 		room_x.setText("ROOM: " + getSelectedRoom());
 		
-		if(setCheckin_b.isSelected()) {
-			checkin_x.setFocusTraversable(true);
-		}
+		
 		
 		setCheckin_b.setOnMouseClicked(checkin -> {
+
 			setCheckin(null);
 			setCheckout(null);
 			setTotalPrice(0);
 			checkin_x.setText(null);
 			checkout_x.setText(null);
 			totalPrice_x.setText(null);
-			refresh();
+            busyDates.clear();
+            populateBusyDates();
+            populateCalendar(currentYearMonth);
+
 		});
 	}
 	
@@ -355,12 +383,32 @@ public class CalendarController implements Initializable {
 	    		
 	    		try {
 	    			
-	    			PreparedStatement statement = Database.con().prepareStatement(
+	    			PreparedStatement delete = Database.con().prepareStatement(
 	    					"DELETE FROM `hoteldatabase`.`reservations` "
 	    			+ "WHERE (`id_reservation` = ? );");
 	    			
-	    			statement.setInt(1, selectedItem.getReservationId());
-		            statement.executeUpdate();
+	    			delete.setInt(1, selectedItem.getReservationId());
+	    			delete.executeUpdate();
+	    			
+	    			PreparedStatement deleteLogs = Database.con().prepareStatement
+	    					( "INSERT INTO `hoteldatabase`.`log_reservations` "
+	    				 + "(`userName`, `action`, `reservationBefore`, `reservationAfter`, `timestamp`) "
+	    				 + "VALUES ('Eljon', 'Deletion', ?, 'Not Existent', ? );" );
+	    			
+	    			String reservation = 
+	    					 "Id: "  + selectedItem.getReservationId()
+	    				   + "| Name:  " + selectedItem.getName().get() 
+	    				   + "| LastName: " + selectedItem.getLastName().get()
+	    				   + "| Tel: " + selectedItem.getPhoneNum().get()
+	    				   + "| Check-in: " + selectedItem.getCheckin().get()
+	    				   + "| Check-out: " + selectedItem.getCheckout().get()
+	    				   + "| TotalPrice " + selectedItem.getTotalPrice().get()
+	    				   + "| DateOfCreation " + selectedItem.getCreatedat().get();
+	    			
+	    			deleteLogs.setString(1, reservation);
+	    			deleteLogs.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+	    			deleteLogs.execute();
+	    			
 		            setCheckin(null);
 		            setCheckout(null);
 		            refresh();
@@ -484,41 +532,43 @@ public class CalendarController implements Initializable {
 		    					));
 		    	
 				reservationsTable.setItems(reservations);
-
+				populateBusyDates();
 		    }
-			if(reservations != null) {
-				
-			for(Reservation r : reservations) {
-				
-				ObjectProperty<Date> startDate = r.getCheckin();
-				ObjectProperty<Date> endDate = r.getCheckout();
-				
-				checkins.add(startDate.get().toLocalDate());
-				
-
-				listOfDates = (
-						 startDate.get().toLocalDate().plusDays(1))
-						.datesUntil(endDate.get().toLocalDate())
-						.collect(Collectors.toList());
-				
-
-				for(LocalDate date : listOfDates) {
-					
-					if(!busyDates.contains(date)) {
-						busyDates.add(date);
-						
-					}
-					
-				}
-				   busyDates.addAll(checkins);
-
-			}}
   
 		} catch (SQLException e) {
 			e.printStackTrace();
 			
 		}
+	}
+	
+	public void populateBusyDates() {
 		
+		if(reservations != null) {
+			
+		for(Reservation r : reservations) {
+			
+			ObjectProperty<Date> startDate = r.getCheckin();
+			ObjectProperty<Date> endDate = r.getCheckout();
+			
+			checkins.add(startDate.get().toLocalDate());
+			
+
+			listOfDates = (
+					 startDate.get().toLocalDate().plusDays(1))
+					.datesUntil(endDate.get().toLocalDate())
+					.collect(Collectors.toList());
+			
+
+			for(LocalDate date : listOfDates) {
+				
+				if(!busyDates.contains(date)) {
+					busyDates.add(date);
+					
+				}
+				
+			}
+			   busyDates.addAll(checkins);
+		}}
 	}
 	
 	
@@ -556,9 +606,7 @@ public class CalendarController implements Initializable {
         	dateCell.setText(txt);
     		dateCell.setDisable(false);
     		
-    		addTempbusyDates();
-    		disablePastDates(dateCell);
-    		setBusyDates(dateCell);
+    		selectionHandler(dateCell);
         	select(dateCell);
         	
             calendarDate = calendarDate.plusDays(1);
@@ -570,7 +618,10 @@ public class CalendarController implements Initializable {
         		String.valueOf(yearMonth.getYear()));
     }
     
-    public void disablePastDates(DayNode dateCell) {
+public void selectionHandler(DayNode dateCell) {
+    	
+    	busyDates.add(getCheckin());
+    	busyDates.add(getCheckout());
     	
     	LocalDate future = null;
     	
@@ -591,7 +642,7 @@ public class CalendarController implements Initializable {
     			&& dateCell.getDate().compareTo(getCheckin()) <= 0) {
     		dateCell.setDisable(true);
     	}
-
+    	
    		if(future != null) 
    		{
    			busyDates.remove(future);
@@ -615,12 +666,16 @@ public class CalendarController implements Initializable {
    	
     	{  
     		dateCell.setStyle(null);
+    		if(temp.contains(dateCell.getDate()) && modify_b.isSelected()) {
+        		
+        		dateCell.setStyle("-fx-background-color: green");
+        		
     	}
-    	
-    }
-    
-    public void setBusyDates(DayNode dateCell) {
-    	if(busyDates.contains(dateCell.getDate())) {
+    		}
+		
+
+		
+		if(busyDates.contains(dateCell.getDate())) {
     		
     		if( (getCheckin() != null 
     				
@@ -633,26 +688,30 @@ public class CalendarController implements Initializable {
     			dateCell.setStyle("-fx-background-color:red");
     		} 
     		
-    		else 
+    		else if (temp.contains(dateCell.getDate())) 
     		
     		{
-    			dateCell.setStyle("-fx-background-color:aqua");
+    			dateCell.setStyle("-fx-background-color: green");
+
+        		
+    		} else {
+    			
+    			dateCell.setStyle("-fx-background-color: aqua");
+    			
     		}
-    		
-    	}
-    	
+		}
+
     }
-    
-    public void addTempbusyDates() {
-    	busyDates.add(getCheckin());
-    	busyDates.add(getCheckout());
-    }
-    
+        
 	public void select(DayNode selected) 
     {
 		selected.setOnMouseClicked(
     			
-    			e -> { 
+    			e -> {
+    				
+					if(modify_b.isSelected()) {
+						busyDates.removeAll(temp);
+					}
     				
     				if(!busyDates.contains(selected.getDate())) 
     				
@@ -661,6 +720,7 @@ public class CalendarController implements Initializable {
     					if(setCheckin_b.isSelected())
     					
     					{
+    						
     						setCheckin(selected.getDate());
     						checkin_x.setText(getCheckin().toString());
     						populateCalendar(currentYearMonth);
@@ -672,7 +732,11 @@ public class CalendarController implements Initializable {
     				{
     					setCheckout(selected.getDate());
         				checkout_x.setText(getCheckout().toString());
-        				refresh();        				
+        				refresh();
+        				if(modify_b.isSelected()) {
+        					busyDates.removeAll(temp);
+        				}
+        				
     				} else if(setCheckout_b.isSelected() && getCheckin() == null) {
     					
     					checkout_x.setText("^^^^^^");
