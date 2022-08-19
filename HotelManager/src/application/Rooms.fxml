@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
@@ -7,23 +8,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="601.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RoomsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="914.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RoomsController">
    <children>
-      <Label fx:id="today_l" alignment="CENTER" layoutX="14.0" layoutY="14.0" prefHeight="41.0" prefWidth="149.0" text="TODAY: ">
-         <font>
-            <Font name="System Bold Italic" size="15.0" />
-         </font>
-      </Label>
-      <TextField fx:id="room_x" layoutX="14.0" layoutY="148.0" prefHeight="41.0" prefWidth="149.0" promptText="Room Num" />
-      <TextField fx:id="price_x" layoutX="14.0" layoutY="198.0" prefHeight="41.0" prefWidth="149.0" promptText="Price" />
-      <ComboBox fx:id="type_x" editable="true" layoutX="14.0" layoutY="246.0" prefWidth="150.0" promptText="Room Categories" />
-      <Button fx:id="addRoom_b" layoutX="14.0" layoutY="288.0" mnemonicParsing="false" onAction="#clickAddRoom" prefHeight="25.0" prefWidth="149.0" text="Add Room" />
-      <Label fx:id="status_l" alignment="CENTER" layoutX="14.0" layoutY="325.0" prefHeight="40.0" prefWidth="150.0">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <ScrollPane fitToWidth="true" layoutX="171.0" layoutY="49.0" prefHeight="522.0" prefWidth="622.0">
+      <ScrollPane fitToWidth="true" layoutX="14.0" layoutY="45.0" prefHeight="522.0" prefWidth="600.0">
          <content>
             <GridPane fx:id="roomLayout" hgap="10.0" vgap="10.0">
               <columnConstraints>
@@ -41,8 +28,85 @@
             </GridPane>
          </content>
       </ScrollPane>
-      <ToggleButton fx:id="viewAllRooms_b" layoutX="171.0" layoutY="14.0" mnemonicParsing="false" onAction="#refresh" text="View All" />
-      <ToggleButton fx:id="viewAvailableRooms_b" layoutX="237.0" layoutY="14.0" mnemonicParsing="false" onAction="#refresh" text="View Available" />
-      <Button layoutX="709.0" layoutY="14.0" mnemonicParsing="false" text="Edit Rooms" />
+      <ToggleButton fx:id="viewAllRooms_b" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="View All" />
+      <ToggleButton fx:id="viewAvailableRooms_b" layoutX="81.0" layoutY="14.0" mnemonicParsing="false" text="View Available" />
+      <Button fx:id="addRoom_b" layoutX="541.0" layoutY="14.0" mnemonicParsing="false" onAction="#clickAddRoom" text="Add Room" />
+      <AnchorPane fx:id="roomView" layoutX="620.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="280.0">
+         <children>
+            <Label layoutX="19.0" layoutY="298.0" prefHeight="40.0" prefWidth="110.0" text="AC:">
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="19.0" layoutY="178.0" prefHeight="40.0" prefWidth="110.0" text="Room Number:">
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="19.0" layoutY="258.0" prefHeight="40.0" prefWidth="110.0" text="Capacity:">
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Label>
+            <Button fx:id="edit_b" layoutX="15.0" layoutY="467.0" mnemonicParsing="false" onAction="#clickEdit" prefHeight="25.0" prefWidth="60.0" text="Edit" />
+            <Label layoutX="19.0" layoutY="218.0" prefHeight="40.0" prefWidth="110.0" text="Category:">
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Label>
+            <Button fx:id="open_b" layoutX="204.0" layoutY="467.0" mnemonicParsing="false" onAction="#clickOpen" prefHeight="25.0" prefWidth="59.0" text="Open" />
+            <ImageView fx:id="photo_x" fitHeight="140.0" fitWidth="250.0" layoutX="16.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true" />
+            <Label layoutX="19.0" layoutY="378.0" prefHeight="40.0" prefWidth="110.0" text="Smoking Allowed:">
+               <font>
+                  <Font name="System Bold Italic" size="12.5" />
+               </font>
+            </Label>
+            <Label layoutX="19.0" layoutY="418.0" prefHeight="40.0" prefWidth="110.0" text="Price/Night:">
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="19.0" layoutY="338.0" prefHeight="40.0" prefWidth="110.0" text="View:">
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Label>
+            <Label fx:id="roomNo_x" alignment="CENTER" layoutX="129.0" layoutY="183.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="category_x" alignment="CENTER" layoutX="129.0" layoutY="223.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="capacity_x" alignment="CENTER" layoutX="129.0" layoutY="263.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="ac_x" alignment="CENTER" layoutX="129.0" layoutY="303.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="view_x" alignment="CENTER" layoutX="129.0" layoutY="343.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="smoking_x" alignment="CENTER" layoutX="129.0" layoutY="383.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="price_x" alignment="CENTER" layoutX="129.0" layoutY="423.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>

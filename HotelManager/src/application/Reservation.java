@@ -1,7 +1,7 @@
 package application;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
@@ -17,7 +17,7 @@ public class Reservation {
 	private ObjectProperty<Date>  checkin;
 	private ObjectProperty<Date> checkout;
 	private LongProperty totalPrice;
-	private ObjectProperty<LocalDateTime> createdat;
+	private ObjectProperty<Timestamp> createdat;
 	private SimpleIntegerProperty roomNum;
 	private LongProperty phoneNum;
 	private SimpleIntegerProperty reservation_id;
@@ -31,7 +31,7 @@ public class Reservation {
 			Date checkin,
 			Date checkout,
 			long totalPrice,
-			LocalDateTime createdat
+			Timestamp createdat
 			) 
 	{
 		super();
@@ -42,7 +42,7 @@ public class Reservation {
         this.checkin = new SimpleObjectProperty<Date>(checkin);
         this.checkout = new SimpleObjectProperty<Date>(checkout);
         this.totalPrice = new SimpleLongProperty(totalPrice);
-        this.createdat = new SimpleObjectProperty<LocalDateTime>(createdat);
+        this.createdat = new SimpleObjectProperty<Timestamp>(createdat);
 	}
 
 	public StringProperty getName() {
@@ -65,7 +65,7 @@ public class Reservation {
 		return totalPrice;
 	}
 
-	public ObjectProperty<LocalDateTime> getCreatedat() {
+	public ObjectProperty<Timestamp> getCreatedat() {
 		return createdat;
 	}
 
