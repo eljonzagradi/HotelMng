@@ -39,27 +39,8 @@ public class RoomsController implements Initializable {
 	@FXML private Button addRoom_b;
 	@FXML private GridPane roomLayout;
 	
-	public void clickAddRoom() {
+	public void openCreateAndEditRoom() {
 		
-		Stage primaryStage = new Stage();
-		
-		try {
-			Parent root = FXMLLoader.load(getClass().getResource("/application/CreateEditRoom.fxml"));
-			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setScene(scene);
-			primaryStage.showAndWait();
-			
-		} 
-		
-		catch(Exception ex) {
-			ex.printStackTrace();
-			
-		}
-		
-	}
-	
-	public void clickEdit() {
 		Stage primaryStage = new Stage();
 		
 		try {
@@ -108,6 +89,4 @@ public class RoomsController implements Initializable {
 		
 	}
 	
-	
-
 }
