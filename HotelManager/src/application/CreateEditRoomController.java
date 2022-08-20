@@ -44,7 +44,7 @@ public class CreateEditRoomController implements Initializable {
 	ObservableList<String> categories = FXCollections.observableArrayList();
 	ObservableList<String> views = FXCollections.observableArrayList("Mountain View", "Sea View", "City View" , "No View");
 	ObservableList<String> currencies = FXCollections.observableArrayList("ALL", "EUR","USD","GPD");
-	public static int room_number = 101;
+	public static int room_number = -999;
 	
 	public void generalInitalValues() {
 		if(room_number == -999) {

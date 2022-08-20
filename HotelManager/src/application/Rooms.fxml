@@ -28,8 +28,11 @@
             </GridPane>
          </content>
       </ScrollPane>
-      <ToggleButton fx:id="viewAllRooms_b" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="View All" />
-      <ToggleButton fx:id="viewAvailableRooms_b" layoutX="81.0" layoutY="14.0" mnemonicParsing="false" text="View Available" />
+      <ToggleButton fx:id="viewAllRooms_b" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" selected="true" text="View All">
+         <toggleGroup>
+            <ToggleGroup fx:id="tg" />
+         </toggleGroup></ToggleButton>
+      <ToggleButton fx:id="viewAvailableRooms_b" layoutX="81.0" layoutY="14.0" mnemonicParsing="false" text="View Available" toggleGroup="$tg" />
       <Button fx:id="addRoom_b" layoutX="541.0" layoutY="14.0" mnemonicParsing="false" onAction="#openCreateAndEditRoom" text="Add Room" />
       <AnchorPane fx:id="roomView" layoutX="620.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="280.0">
          <children>
@@ -48,13 +51,13 @@
                   <Font name="System Bold Italic" size="13.0" />
                </font>
             </Label>
-            <Button fx:id="edit_b" layoutX="15.0" layoutY="467.0" mnemonicParsing="false" onAction="#openCreateAndEditRoom" prefHeight="25.0" prefWidth="60.0" text="Edit" />
+            <Button fx:id="edit_b" disable="true" layoutX="15.0" layoutY="467.0" mnemonicParsing="false" onAction="#openCreateAndEditRoom" prefHeight="25.0" prefWidth="60.0" text="Edit" />
             <Label layoutX="19.0" layoutY="218.0" prefHeight="40.0" prefWidth="110.0" text="Category:">
                <font>
                   <Font name="System Bold Italic" size="13.0" />
                </font>
             </Label>
-            <Button fx:id="open_b" layoutX="204.0" layoutY="467.0" mnemonicParsing="false" onAction="#clickOpen" prefHeight="25.0" prefWidth="59.0" text="Open" />
+            <Button fx:id="open_b" disable="true" layoutX="204.0" layoutY="467.0" mnemonicParsing="false" onAction="#clickOpen" prefHeight="25.0" prefWidth="59.0" text="Open" />
             <ImageView fx:id="photo_x" fitHeight="140.0" fitWidth="250.0" layoutX="16.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true" />
             <Label layoutX="19.0" layoutY="378.0" prefHeight="40.0" prefWidth="110.0" text="Smoking Allowed:">
                <font>
