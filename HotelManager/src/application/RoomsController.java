@@ -1,6 +1,8 @@
 package application;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
@@ -38,6 +40,8 @@ public class RoomsController implements Initializable {
 	@FXML private ToggleButton viewAvailableRooms_b;
 	@FXML private Button addRoom_b;
 	@FXML private GridPane roomLayout;
+	
+	public static List<Integer> roomList = new ArrayList<Integer>();
 	
 	public void openCreateAndEditRoom() {
 		
