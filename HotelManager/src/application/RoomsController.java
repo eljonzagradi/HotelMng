@@ -319,7 +319,6 @@ public class RoomsController implements Initializable {
 		if(!areEmpty()) {
 			
 			int roomNo = Integer.parseInt(roomNo_x.getText());
-
 			String category = category_x.getValue();
 			int capacity = Integer.parseInt(capacity_x.getText());
 			RadioButton  selectedAc = (RadioButton) ac.getSelectedToggle();
@@ -349,8 +348,12 @@ public class RoomsController implements Initializable {
 					newRoom.setInt(7, price);
 					newRoom.setString(8, currency);
 					
+					if(file != null) {
 					FileInputStream f = new FileInputStream(file);
 					newRoom.setBinaryStream(9, f,f.available());
+					} else { 
+						newRoom.setBinaryStream(9, null);
+					}
 					
 		    		int status = newRoom.executeUpdate();
 		    		
