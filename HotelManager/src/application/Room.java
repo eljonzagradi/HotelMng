@@ -10,6 +10,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 public class Room  extends Label {
 	private int room_id;
@@ -40,11 +41,11 @@ public class Room  extends Label {
         this.setAlignment(Pos.CENTER);
         this.setMaxHeight(300);
         this.setMaxWidth(300);
+        this.setFont(new Font("Arial", 20));
 		this.setBackground(new Background(
-				new BackgroundFill(Color.BROWN,
+				new BackgroundFill(Color.AQUA,
 						new CornerRadii(0),
 						new Insets(0))));
-		
 		this.setStyle("-fx-border-color: white;");
 		this.setText(  "ROOM:" +number+"\n");
 	}

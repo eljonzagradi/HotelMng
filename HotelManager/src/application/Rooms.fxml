@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="914.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RoomsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="616.0" prefWidth="926.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RoomsController">
    <children>
-      <ScrollPane fitToWidth="true" layoutX="14.0" layoutY="45.0" prefHeight="522.0" prefWidth="600.0">
+      <ScrollPane fitToWidth="true" layoutX="14.0" layoutY="45.0" prefHeight="559.0" prefWidth="615.0">
          <content>
             <GridPane fx:id="roomLayout" hgap="10.0" vgap="10.0">
               <columnConstraints>
@@ -28,87 +28,97 @@
             </GridPane>
          </content>
       </ScrollPane>
-      <ToggleButton fx:id="viewAllRooms_b" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" selected="true" text="View All">
+      <ToggleButton fx:id="viewAllRooms_b" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#refresh" text="View All">
          <toggleGroup>
             <ToggleGroup fx:id="tg" />
          </toggleGroup></ToggleButton>
-      <ToggleButton fx:id="viewAvailableRooms_b" layoutX="81.0" layoutY="14.0" mnemonicParsing="false" text="View Available" toggleGroup="$tg" />
-      <Button fx:id="addRoom_b" layoutX="541.0" layoutY="14.0" mnemonicParsing="false" onAction="#openCreateAndEditRoom" text="Add Room" />
-      <AnchorPane fx:id="roomView" layoutX="620.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="280.0">
+      <ToggleButton fx:id="viewAvailableRooms_b" layoutX="81.0" layoutY="14.0" mnemonicParsing="false" onAction="#refresh" text="View Available" toggleGroup="$tg" />
+      <Button fx:id="addRoom_b" layoutX="504.0" layoutY="14.0" mnemonicParsing="false" onAction="#clickAdd" prefHeight="25.0" prefWidth="110.0" text="Create Room" />
+      <AnchorPane layoutX="632.0" layoutY="22.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="596.0" prefWidth="280.0">
          <children>
-            <Label layoutX="19.0" layoutY="298.0" prefHeight="40.0" prefWidth="110.0" text="AC:">
+            <Label fx:id="header_l" alignment="CENTER" layoutX="15.0" layoutY="14.0" prefHeight="40.0" prefWidth="250.0" text="Room Details:">
+               <font>
+                  <Font name="System Bold Italic" size="15.0" />
+               </font>
+            </Label>
+            <ImageView fx:id="photo_x" fitHeight="140.0" fitWidth="250.0" layoutX="15.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true" />
+            <TextField fx:id="roomNo_x" alignment="CENTER" layoutX="128.0" layoutY="200.0" prefHeight="30.0" prefWidth="132.0">
+               <font>
+                  <Font name="System Bold Italic" size="14.0" />
+               </font>
+            </TextField>
+            <ComboBox fx:id="category_x" editable="true" layoutX="128.0" layoutY="240.0" prefHeight="30.0" prefWidth="132.0" />
+            <TextField fx:id="capacity_x" alignment="CENTER" layoutX="128.0" layoutY="280.0" prefHeight="30.0" prefWidth="132.0">
+               <font>
+                  <Font name="System Bold Italic" size="14.0" />
+               </font>
+            </TextField>
+            <RadioButton fx:id="ac_yes" layoutX="128.0" layoutY="327.0" mnemonicParsing="false" text="Yes">
+               <toggleGroup>
+                  <ToggleGroup fx:id="ac" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="ac_no" layoutX="194.0" layoutY="327.0" mnemonicParsing="false" text="No" toggleGroup="$ac" />
+            <ChoiceBox fx:id="view_x" layoutX="128.0" layoutY="360.0" prefHeight="30.0" prefWidth="132.0" />
+            <RadioButton fx:id="smoking_yes" layoutX="128.0" layoutY="407.0" mnemonicParsing="false" text="Yes">
+               <toggleGroup>
+                  <ToggleGroup fx:id="smoking" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="smoking_no" layoutX="194.0" layoutY="407.0" mnemonicParsing="false" text="No" toggleGroup="$smoking" />
+            <TextField fx:id="price_night_x" alignment="CENTER_RIGHT" layoutX="128.0" layoutY="440.0" prefHeight="30.0" prefWidth="75.0">
+               <font>
+                  <Font name="System Bold Italic" size="14.0" />
+               </font>
+            </TextField>
+            <ChoiceBox fx:id="currency_x" layoutX="203.0" layoutY="440.0" prefHeight="30.0" prefWidth="59.0" />
+            <Button fx:id="submit_b" defaultButton="true" disable="true" layoutX="11.0" layoutY="515.0" mnemonicParsing="false" onAction="#clickSubmit" prefHeight="25.0" prefWidth="75.0" text="Submit" />
+            <Label layoutX="18.0" layoutY="195.0" prefHeight="40.0" prefWidth="110.0" text="Room Number:">
                <font>
                   <Font name="System Bold Italic" size="13.0" />
                </font>
             </Label>
-            <Label layoutX="19.0" layoutY="178.0" prefHeight="40.0" prefWidth="110.0" text="Room Number:">
+            <Label layoutX="18.0" layoutY="235.0" prefHeight="40.0" prefWidth="110.0" text="Category:">
                <font>
                   <Font name="System Bold Italic" size="13.0" />
                </font>
             </Label>
-            <Label layoutX="19.0" layoutY="258.0" prefHeight="40.0" prefWidth="110.0" text="Capacity:">
+            <Label layoutX="18.0" layoutY="275.0" prefHeight="40.0" prefWidth="110.0" text="Capacity:">
                <font>
                   <Font name="System Bold Italic" size="13.0" />
                </font>
             </Label>
-            <Button fx:id="edit_b" disable="true" layoutX="15.0" layoutY="467.0" mnemonicParsing="false" onAction="#openCreateAndEditRoom" prefHeight="25.0" prefWidth="60.0" text="Edit" />
-            <Label layoutX="19.0" layoutY="218.0" prefHeight="40.0" prefWidth="110.0" text="Category:">
+            <Label layoutX="18.0" layoutY="315.0" prefHeight="40.0" prefWidth="110.0" text="AC:">
                <font>
                   <Font name="System Bold Italic" size="13.0" />
                </font>
             </Label>
-            <Button fx:id="open_b" disable="true" layoutX="204.0" layoutY="467.0" mnemonicParsing="false" onAction="#clickOpen" prefHeight="25.0" prefWidth="59.0" text="Open" />
-            <ImageView fx:id="photo_x" fitHeight="140.0" fitWidth="250.0" layoutX="16.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true" />
-            <Label layoutX="19.0" layoutY="378.0" prefHeight="40.0" prefWidth="110.0" text="Smoking Allowed:">
+            <Label layoutX="18.0" layoutY="355.0" prefHeight="40.0" prefWidth="110.0" text="View:">
+               <font>
+                  <Font name="System Bold Italic" size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="18.0" layoutY="395.0" prefHeight="40.0" prefWidth="110.0" text="Smoking Allowed:">
                <font>
                   <Font name="System Bold Italic" size="12.5" />
                </font>
             </Label>
-            <Label layoutX="19.0" layoutY="418.0" prefHeight="40.0" prefWidth="110.0" text="Price/Night:">
+            <Label layoutX="18.0" layoutY="435.0" prefHeight="40.0" prefWidth="110.0" text="Price/Night:">
                <font>
                   <Font name="System Bold Italic" size="13.0" />
                </font>
             </Label>
-            <Label layoutX="19.0" layoutY="338.0" prefHeight="40.0" prefWidth="110.0" text="View:">
-               <font>
-                  <Font name="System Bold Italic" size="13.0" />
-               </font>
-            </Label>
-            <Label fx:id="roomNo_x" alignment="CENTER" layoutX="129.0" layoutY="183.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+            <Label fx:id="footer_l" alignment="CENTER" layoutX="11.0" layoutY="475.0" prefHeight="40.0" prefWidth="250.0" textFill="RED">
                <font>
                   <Font name="System Bold Italic" size="15.0" />
                </font>
             </Label>
-            <Label fx:id="category_x" alignment="CENTER" layoutX="129.0" layoutY="223.0" prefHeight="30.0" prefWidth="132.0" text="Label">
+            <Button fx:id="open_b" disable="true" layoutX="11.0" layoutY="548.0" mnemonicParsing="false" onAction="#clickOpen" prefHeight="30.0" prefWidth="250.0" text="Open">
                <font>
                   <Font name="System Bold Italic" size="15.0" />
-               </font>
-            </Label>
-            <Label fx:id="capacity_x" alignment="CENTER" layoutX="129.0" layoutY="263.0" prefHeight="30.0" prefWidth="132.0" text="Label">
-               <font>
-                  <Font name="System Bold Italic" size="15.0" />
-               </font>
-            </Label>
-            <Label fx:id="ac_x" alignment="CENTER" layoutX="129.0" layoutY="303.0" prefHeight="30.0" prefWidth="132.0" text="Label">
-               <font>
-                  <Font name="System Bold Italic" size="15.0" />
-               </font>
-            </Label>
-            <Label fx:id="view_x" alignment="CENTER" layoutX="129.0" layoutY="343.0" prefHeight="30.0" prefWidth="132.0" text="Label">
-               <font>
-                  <Font name="System Bold Italic" size="15.0" />
-               </font>
-            </Label>
-            <Label fx:id="smoking_x" alignment="CENTER" layoutX="129.0" layoutY="383.0" prefHeight="30.0" prefWidth="132.0" text="Label">
-               <font>
-                  <Font name="System Bold Italic" size="15.0" />
-               </font>
-            </Label>
-            <Label fx:id="price_x" alignment="CENTER" layoutX="129.0" layoutY="423.0" prefHeight="30.0" prefWidth="132.0" text="Label">
-               <font>
-                  <Font name="System Bold Italic" size="15.0" />
-               </font>
-            </Label>
+               </font></Button>
+            <Button fx:id="clear_b" disable="true" layoutX="188.0" layoutY="515.0" mnemonicParsing="false" onAction="#clickClear" prefHeight="25.0" prefWidth="75.0" text="Clear" />
+            <Button fx:id="edit_b" disable="true" layoutX="103.0" layoutY="515.0" mnemonicParsing="false" onAction="#clickEdit" prefHeight="25.0" prefWidth="75.0" text="Edit" />
          </children>
       </AnchorPane>
    </children>
