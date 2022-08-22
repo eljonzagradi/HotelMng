@@ -13,146 +13,116 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class RoomsController implements Initializable {
 
-	@FXML private TextField room_x;
-	@FXML private TextField price_x;
-	@FXML private ComboBox<String> type_x;
-	@FXML private Button addRoom_b;
-	@FXML private GridPane roomLayout;
-	@FXML private Label currentDate_l;
-	@FXML private Label status_l;
-	@FXML private Label today_l;
+	//RoomView FXML Components:
+	@FXML private Label header_l;
+	@FXML private ImageView photo_x;
+	@FXML private TextField roomNo_x;
+	@FXML private ComboBox<String>  category_x;
+	@FXML private TextField capacity_x;
+	@FXML private RadioButton ac_yes;
+	@FXML private RadioButton ac_no;
+	@FXML private ToggleGroup ac;
+	@FXML private ChoiceBox<String> view_x;
+	@FXML private RadioButton smoking_yes;
+	@FXML private RadioButton smoking_no;
+	@FXML private ToggleGroup smoking;
+	@FXML private TextField price_night_x;
+	@FXML private ChoiceBox<String>  currency_x;
+	@FXML private Label footer_l;
+	@FXML private Button submit_b;
+	@FXML private Button clear_b;
+	
+	@FXML private BorderPane borderPane;
 	@FXML private ToggleButton viewAllRooms_b;
 	@FXML private ToggleButton viewAvailableRooms_b;
-	ToggleGroup tg = new ToggleGroup();
-
+	@FXML private ToggleGroup tg;
+	@FXML private Button addRoom_b;
+	@FXML private Button edit_b;
+	@FXML private Button open_b;
+	@FXML private GridPane roomLayout;
+	
+	
 	List<Integer> roomList = new ArrayList<Integer>();
-	ObservableList<String> roomCategories = FXCollections.observableArrayList();
+	ObservableList<String> categories = FXCollections.observableArrayList();
+	ObservableList<String> views = FXCollections.observableArrayList("Mountain View", "Sea View", "City View" , "No View");
+	ObservableList<String> currencies = FXCollections.observableArrayList("ALL", "EUR","USD","GPD");
 	LocalDate todayDate = LocalDate.now();
+	private Room activeSelection = null;
 	
-	public void refresh() {
-		roomLayout.getChildren().clear();
-		roomList.clear();			
-		loadRooms();
+	public Room getActiveSelection() {
+		return activeSelection;
 	}
 	
-	public boolean areEmpty() {
-		
-		if(     room_x.getText().isBlank()
-			||  price_x.getText().isBlank()
-			||  type_x.getValue() == null) 
-		
-		{
-			return true;
-		}
-		
-		else {
-			
-			return false;
-		}
+	public void setActiveSelection(Room active) {
+		this.activeSelection = active;
 		
 	}
 	
-	public void clickAddRoom() {
-		
-		if(!areEmpty()) {
-			
-			viewAllRooms_b.setSelected(true);
-			refresh();
-			int roomNum = Integer.parseInt(room_x.getText());
-		    int roomPrice = Integer.parseInt(price_x.getText());
-		    String roomType = type_x.getValue();
-		    
-		    if(!roomList.contains(roomNum)) {
-		    	
-		    	try {
-		    		
-		    		PreparedStatement insertRoom =
-		    				Database.con().prepareStatement
-		    				("INSERT INTO `hoteldatabase`.`rooms` (`number`, `category`, `price`) "	
-		    				+ "VALUES ('"+roomNum+"', '"+roomType+"', '"+roomPrice+"');\r\n");
-		    		
-		    		int status = insertRoom.executeUpdate();
-		    		if(status != 0) {
-		    			addCategoty(type_x);
-		    			roomCategories.add(roomType);
-		    			roomList.add(roomNum);
-		    			refresh();
-		    			Alert alert = new Alert(AlertType.INFORMATION);
-		    			alert.setTitle("Information Dialog");
-		    			alert.setHeaderText(null);
-		    			alert.setContentText("!!!!Success!!!!");
-
-		    			alert.showAndWait();
-		    			
-		    		}
-		    		
-		    	} catch (SQLException e1) {
-		    		
-		    		e1.printStackTrace();
-		    		
-		    	}
-		    	
-		    } else {
-		    	
-		    	Alert alert = new Alert(AlertType.ERROR);
-		    	alert.setTitle("Error Dialog");
-		    	alert.setHeaderText(null);
-		    	alert.setContentText("Room Exists");
-
-		    	alert.showAndWait();
-		    	
-		    }
-		    
-		    room_x.clear();
-		    price_x.clear();
-		    type_x.setValue("Room Types");
-		    
-		} else {
-			
-			status_l.setText("Please complete all \n the required fields");
-			
-		}
-		
+	public void generalInitalValues() {
+		loadCategories();
+		view_x.setItems(views);
+		currency_x.setItems(currencies);
 	}
 	
-	public void addCategoty(ComboBox<String> cb ) {
+	public void clickEdit() {
+		setDisable(false);
+		roomNo_x.setDisable(true);
+		submit_b.setDisable(false);
+	}
+	
+	public void clickAdd() {
+		clickClear();
+		setDisable(false);
+		submit_b.setDisable(false);
+		clear_b.setDisable(false);
+	}
+	
+	public void clickOpen() {
 		
-		String category = cb.getEditor().getText();
+		CalendarController.selectedRoom = Integer.parseInt(roomNo_x.getText());
+		CalendarController.priceNight = Integer.parseInt(price_night_x.getText());
 		
-		if(!roomCategories.contains(category)) {
+		Stage stage =  (Stage) open_b.getScene().getWindow();
+		stage.close();
+		
+		Stage primaryStage = new Stage();
+		
+		try {
+			Parent root = FXMLLoader.load(getClass().getResource("/application/Calendar.fxml"));
+			Scene scene = new Scene(root);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
 			
-			try {
-				
-				PreparedStatement availableRooms = Database.con().prepareStatement
-					("INSERT INTO `hoteldatabase`.`roomcategories` (`name`) VALUES ('"+category+"');");
-				     
-				availableRooms.execute();
-				} 
-			
-			
-			catch (SQLException e) {
-					e.printStackTrace();
-
-			}
+		} 
+		
+		catch(Exception ex) {
+			ex.printStackTrace();
 			
 		}
 		
@@ -166,18 +136,21 @@ public class RoomsController implements Initializable {
 		
 		try {
 			PreparedStatement availableRooms = Database.con().prepareStatement
-					("SELECT ro.number,category,price,check_in,check_out\r\n"
+			("SELECT number, id_room, category, capacity, air_c, view, smoking, price_night, currency, photo, check_in, check_out\r\n"
 			+ "FROM  hoteldatabase.rooms ro\r\n"
 			+ "LEFT JOIN hoteldatabase.reservations r\r\n"
-			+ "USING (number)  \r\n"
-			+ "where  ro.number NOT IN \r\n"
-			+ "(SELECT number FROM  hoteldatabase.rooms ro \r\n"
-			+ "LEFT JOIN hoteldatabase.reservations r "
-			+ "USING (number) WHERE NOT check_in > '"+todayDate+"' AND check_out > '"+todayDate+"')\r\n"
+			+ "USING (number)\r\n"
+			+ "WHERE  ro.number NOT IN\r\n"
+			+ "(SELECT number FROM  hoteldatabase.rooms ro\r\n"
+			+ "LEFT JOIN hoteldatabase.reservations r\r\n"
+			+ "USING (number) WHERE NOT check_in > ? AND check_out > ?)\r\n"
 			+ "ORDER BY ro.number,check_in");
+			availableRooms.setDate(1,java.sql.Date.valueOf(todayDate));
+			availableRooms.setDate(2,java.sql.Date.valueOf(todayDate));
+			
 			
 			PreparedStatement allRooms = Database.con().prepareStatement
-					( "SELECT ro.number,category,price,check_in, check_out \r\n"
+			( "SELECT *"
 			+ "FROM `hoteldatabase`.rooms ro\r\n"
 		    + "LEFT JOIN `hoteldatabase`.reservations r \r\n"
 			+ "ON ro.number = r.number \r\n"
@@ -194,14 +167,27 @@ public class RoomsController implements Initializable {
 				
 				Date checkin = resultSet.getDate("check_in");
 			    Date checkout = resultSet.getDate("check_out");
-			    int roomNum = resultSet.getInt("number");
-			    String roomType = resultSet.getString("category");
-			    int roomPrice = resultSet.getInt("price");
-			    Room room = new Room (roomNum,roomType,roomPrice );
-			    if(!roomList.contains(roomNum)) {
+			    
+			    int roomID = resultSet.getInt("id_room");
+				int roomNo = resultSet.getInt("number");
+				String category = resultSet.getString("category");
+			    int capacity = resultSet.getInt("capacity");
+			    String acValue = resultSet.getString("air_c");
+			    String view = resultSet.getString("view");
+			    String smokingValue = resultSet.getString("smoking");
+			    int price =  resultSet.getInt("price_night");
+			    String currency = resultSet.getString("currency");
+			    
+			    Room room = new Room (
+			    		roomID, roomNo, category,
+			    		capacity, acValue, view,
+			    		smokingValue, price, currency,
+			    		null);
+			    selectRoom(room);
+			    
+			    if(!roomList.contains(roomNo)) {
 
-
-			    	if(checkin !=null && checkout !=null ) {
+			    	if(checkin !=null || checkout !=null ) {
 			    		
 			    		if(checkin.toLocalDate().compareTo(todayDate)
 			    				* todayDate.compareTo(checkout.toLocalDate()) >= 0) {
@@ -223,7 +209,7 @@ public class RoomsController implements Initializable {
 				    		++rowInx;
 				    		}
 				    }
-		    	roomList.add(roomNum);
+		    	roomList.add(roomNo);
 			}
 
 			
@@ -234,76 +220,295 @@ public class RoomsController implements Initializable {
 		}
 		
 	 }
-
 	
-	public void choiceBoxSetup() {
+	public void selectRoom(Room room) {
+		room.setOnMouseClicked( e -> {
+			setActiveSelection(room);
+			clickRoom(room);
+		});
+	}
+	
+	public void clickRoom(Room room) {
+		setDisable(true);
+		loadSelectedRoom(room.getNumber());
+		clear_b.setDisable(false);
+		open_b.setDisable(false);
+		edit_b.setDisable(false);
+	}
+	
+	public void setDisable(boolean disable) {
+		roomNo_x.setDisable(disable);
+		category_x.setDisable(disable);
+		capacity_x.setDisable(disable);
+		ac_yes.setDisable(disable);
+		ac_no.setDisable(disable);
+		view_x.setDisable(disable);
+		smoking_yes.setDisable(disable);
+		smoking_no.setDisable(disable);
+		price_night_x.setDisable(disable);
+		currency_x.setDisable(disable);
+	}
+	
+	public  void refresh() {
+		roomLayout.getChildren().clear();
+		roomList.clear();
+		loadRooms();		
+	}
+	
+	public void clickClear() {
+		setDisable(true);
+		roomNo_x.clear();
+		category_x.setValue("");
+		capacity_x.clear();;
+		ac_yes.setSelected(false);
+		ac_no.setSelected(false);
+		view_x.setValue(null);
+		smoking_yes.setSelected(false);
+		smoking_no.setSelected(false);
+		price_night_x.clear();
+		footer_l.setText(null);
 		
-		try {
-			PreparedStatement loadCategories = Database.con().prepareStatement("select * from hoteldatabase.roomcategories");
+		submit_b.setDisable(true);
+		clear_b.setDisable(true);
+		open_b.setDisable(true);
+		edit_b.setDisable(true);
+		
+		refresh();
+
+	}
+	
+	public void clickSubmit() {
+		
+		if(!areEmpty()) {
 			
-			ResultSet rs = loadCategories.executeQuery();
+			int roomNo = Integer.parseInt(roomNo_x.getText());
+
+			String category = category_x.getValue();
+			int capacity = Integer.parseInt(capacity_x.getText());
+			RadioButton  selectedAc = (RadioButton) ac.getSelectedToggle();
+			String acValue = selectedAc.getText();
+			String view = view_x.getValue();
+			RadioButton  selectedSmoking = (RadioButton) smoking.getSelectedToggle();
+			String smokingValue = selectedSmoking.getText();
+			int price =  Integer.parseInt(price_night_x.getText());
+			String currency = currency_x.getValue();
 			
-			while(rs.next()) {
+			if(!roomList.contains(roomNo) 
+					&& !roomNo_x.isDisabled()) {
 				
-				String roomCat = rs.getString("name");
+				PreparedStatement newRoom;
+				try {
+					newRoom = Database.con().prepareStatement
+							("INSERT INTO `hoteldatabase`.`rooms` "
+							+ "(`number`, `category`, `capacity`, `air_c`, `view`, `smoking`, `price_night`, `currency`) "
+							+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);");
+					
+					newRoom.setInt(1, roomNo);
+					newRoom.setString(2, category);
+					newRoom.setInt(3, capacity);
+					newRoom.setString(4, acValue);
+					newRoom.setString(5, view);
+					newRoom.setString(6, smokingValue);
+					newRoom.setInt(7, price);
+					newRoom.setString(8, currency);
+					
+		    		int status = newRoom.executeUpdate();
+		    		
+		    		if(status != 0) {
+		    			addCategoty(category_x);
+		    		} 
+		    		
+		    		else {
+		    			footer_l.setText("Something Went Wrong");
+		    		}
+
+				} catch (SQLException e) {
+					e.printStackTrace();
+
+				}
 				
-				if(!roomCategories.contains(roomCat)) {
+			} else if(roomList.contains(roomNo) && roomNo_x.isDisabled()) {
 				
-				roomCategories.add(roomCat);
+				PreparedStatement updateRoom;
 				
+				try {
+					
+					updateRoom = Database.con().prepareStatement
+							("UPDATE `hoteldatabase`.`rooms`\r\n"
+									+ "SET\r\n"
+									+ "`category` = ?,\r\n"
+									+ "`capacity` = ?,\r\n"
+									+ "`air_c` = ?,\r\n"
+									+ "`view` = ?,\r\n"
+									+ "`smoking` = ?,\r\n"
+									+ "`price_night` = ?,\r\n"
+									+ "`currency` = ?\r\n"
+									+ "\r\n"
+									+ "WHERE `number` = ?;");
+					updateRoom.setString(1, category);
+					updateRoom.setInt(2, capacity);
+					updateRoom.setString(3, acValue);
+					updateRoom.setString(4, view);
+					updateRoom.setString(5, smokingValue);
+					updateRoom.setInt(6, price);
+					updateRoom.setString(7, currency);
+					updateRoom.setInt(8, roomNo);
+					
+		    		int status = updateRoom.executeUpdate();
+		    		
+		    		if(status != 0) {
+		    			addCategoty(category_x);
+		    			clickClear();
+		    			clickRoom(getActiveSelection());
+		    			refresh();
+		    			setActiveSelection(null);
+	        			
+		    		} else {
+		    			footer_l.setText("Something Went Wrong");
+		    		}
+		    		
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
 				
 			}
 			
-			type_x.setItems(roomCategories);
+			else if(roomList.contains(roomNo) && !roomNo_x.isDisabled()) {
+				footer_l.setText("Room Exists");
+				
+			}
 			
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} else if(areEmpty()) {
+			footer_l.setText("Please Complete All Fields");
 		}
 		
 	}
+	
+     public void loadSelectedRoom(int room_number) {
+    	 
+    	 try {
+			 
+			 PreparedStatement selectRoom = Database.con().prepareStatement
+					 ("SELECT * "
+		 		+ "FROM hoteldatabase.rooms\r\n"
+		 		+ "WHERE number = ? ");
+			 selectRoom.setInt(1, room_number);
+			 ResultSet selectedRoom = selectRoom.executeQuery();
+			 
+			 while(selectedRoom.next()) {
+				 
+				 int roomNo = selectedRoom.getInt("number");
+				 String category = selectedRoom.getString("category");
+			     int capacity = selectedRoom.getInt("capacity");
+			     String acValue = selectedRoom.getString("air_c");
+			     String view = selectedRoom.getString("view");
+			     String smokingValue = selectedRoom.getString("smoking");
+			     int price =  selectedRoom.getInt("price_night");
+			     String currency = selectedRoom.getString("currency");
+			
+			     roomNo_x.setText(roomNo + "");
+			     category_x.setValue(category);
+			     capacity_x.setText(capacity + "");
+			     if(acValue.equals("Yes")) {
+			    	 ac_yes.setSelected(true);
+			    	 } else {
+			    		 ac_no.setSelected(true);
+			    		 }
+			     view_x.setValue(view);
+			     if(smokingValue.equals("Yes")) {
+			    	 smoking_yes.setSelected(true);
+			    	 } else {
+			    		 smoking_no.setSelected(true);
+			    		 }
+			     price_night_x.setText(price + "");
+			     currency_x.setValue(currency);
+			     }
+			 
+		 } catch (SQLException e) {
+			 e.printStackTrace();
+			 
+		 }
+    	 refresh();
+	 
+}
+     
+     public boolean areEmpty() {
+ 		if(roomNo_x.getText().trim().isEmpty()
+ 				|| category_x.getValue().trim().isEmpty()
+ 				|| capacity_x.getText().trim().isEmpty()
+ 				|| view_x.getValue() == null
+ 				|| price_night_x.getText().trim().isEmpty()
+ 				|| currency_x.getValue() == null
+ 				|| ac.getSelectedToggle() == null
+ 				|| smoking.getSelectedToggle() == null)
+ 		{
+ 			return true;
+ 		} 
+ 		
+ 		else {
+ 			return false;
+ 		}
+ 		
+ 	}
+ 	
+ 	
+ 	public void loadCategories() {
+ 		
+ 		try {
+ 			PreparedStatement loadCategories = 
+ 					Database.con().prepareStatement
+ 					("select * from hoteldatabase.roomcategories");
+ 			ResultSet rs = loadCategories.executeQuery();
+ 			
+ 			while(rs.next()) {
+ 				String roomCat = rs.getString("name");
+ 				
+ 				if(!categories.contains(roomCat)) {
+ 					categories.add(roomCat);
+ 					}
+ 				}
+ 			category_x.setItems(categories);
+ 			
+ 		} catch (SQLException e) {
+ 			e.printStackTrace();	
+ 		}
 
+ 	}
+ 	
+ 	public void addCategoty(ComboBox<String> cb ) {
+ 		
+ 		String category = cb.getEditor().getText();
+ 		
+ 		if(!categories.contains(category)) {
+ 			
+ 			try {
+ 				
+ 				PreparedStatement newCategory = Database.con().prepareStatement
+ 						("INSERT INTO `hoteldatabase`.`roomcategories` (`name`) VALUES ( ? );");
+ 				newCategory.setString(1, category);				     
+ 				newCategory.execute();
+ 				} 
+ 			
+ 			catch (SQLException e) {
+ 					e.printStackTrace();
+
+ 			}
+ 			
+ 		}
+ 		
+ 	}
+	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		generalInitalValues();
+		setDisable(true);
 		tg.selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
 		    if (newVal == null)
 		        oldVal.setSelected(true);
 		});
-		viewAllRooms_b.setToggleGroup(tg);
-		viewAvailableRooms_b.setToggleGroup(tg);
 		viewAllRooms_b.setSelected(true);
-		today_l.setText("TODAY: " + LocalDate.now());
 		loadRooms();
-		choiceBoxSetup();
+
 	}
 	
-//	public void setMenu(Room selectedRoom) {
-//		
-//		ContextMenu contextMenu = new ContextMenu();
-//		MenuItem del_b = new MenuItem("Delete");
-//		del_b.setOnAction((event) -> {
-//			
-//			try {
-//				PreparedStatement ps =
-//						Database.con().prepareStatement
-//		             ("SET FOREIGN_KEY_CHECKS=0;"+
-//		      		 "	DELETE FROM `hoteldatabase`.`rooms` WHERE (`number` = '"+selectedRoom.getNumber()+"');");
-//				
-//				int status = ps.executeUpdate();
-//				
-//				if(status != 0) {
-//					
-//					status_l.setText("!!!Room Deleted!!!");
-//				}
-//			} catch (SQLException e1) {
-//				e1.printStackTrace();
-//			}
-//	
-//		});
-//		contextMenu.getItems().addAll(del_b);
-//		selectedRoom.setContextMenu(contextMenu);
-//		
-//		
-//	}
-	
-}
+	}
