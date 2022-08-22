@@ -1,6 +1,12 @@
 package application;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Blob;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,6 +32,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -34,6 +41,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class RoomsController implements Initializable {
@@ -65,7 +73,7 @@ public class RoomsController implements Initializable {
 	@FXML private Button edit_b;
 	@FXML private Button open_b;
 	@FXML private GridPane roomLayout;
-	
+	@FXML private Button imageSelector_b;
 	
 	List<Integer> roomList = new ArrayList<Integer>();
 	ObservableList<String> categories = FXCollections.observableArrayList();
@@ -128,6 +136,32 @@ public class RoomsController implements Initializable {
 		
 	}
 	
+	File file = null;
+	
+	public void clickSelectImage() {
+		
+		FileChooser chooser = new FileChooser();
+	    chooser.setTitle("Select Image File");
+
+	    chooser.getExtensionFilters().addAll(
+	        new FileChooser.ExtensionFilter("Image Files",
+	            "*.png", "*.jpg", "*.jpeg"));
+
+	    file = chooser.showOpenDialog(null);
+		URL url;
+		
+		if(file != null){
+			
+			try {
+				url = file.toURI().toURL();
+				photo_x.setImage(new Image(url.toExternalForm()));
+				
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void loadRooms() {
 
 		int rowInx = 0;
@@ -178,6 +212,7 @@ public class RoomsController implements Initializable {
 			    int price =  resultSet.getInt("price_night");
 			    String currency = resultSet.getString("currency");
 			    
+			      
 			    Room room = new Room (
 			    		roomID, roomNo, category,
 			    		capacity, acValue, view,
@@ -237,6 +272,7 @@ public class RoomsController implements Initializable {
 	}
 	
 	public void setDisable(boolean disable) {
+		imageSelector_b.setDisable(disable);
 		roomNo_x.setDisable(disable);
 		category_x.setDisable(disable);
 		capacity_x.setDisable(disable);
@@ -267,6 +303,7 @@ public class RoomsController implements Initializable {
 		smoking_no.setSelected(false);
 		price_night_x.clear();
 		footer_l.setText(null);
+		photo_x.setImage(null);
 		
 		submit_b.setDisable(true);
 		clear_b.setDisable(true);
@@ -300,8 +337,8 @@ public class RoomsController implements Initializable {
 				try {
 					newRoom = Database.con().prepareStatement
 							("INSERT INTO `hoteldatabase`.`rooms` "
-							+ "(`number`, `category`, `capacity`, `air_c`, `view`, `smoking`, `price_night`, `currency`) "
-							+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);");
+							+ "(`number`, `category`, `capacity`, `air_c`, `view`, `smoking`, `price_night`, `currency`,`photo`) "
+							+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?,?);");
 					
 					newRoom.setInt(1, roomNo);
 					newRoom.setString(2, category);
@@ -312,17 +349,21 @@ public class RoomsController implements Initializable {
 					newRoom.setInt(7, price);
 					newRoom.setString(8, currency);
 					
+					FileInputStream f = new FileInputStream(file);
+					newRoom.setBinaryStream(9, f,f.available());
+					
 		    		int status = newRoom.executeUpdate();
 		    		
 		    		if(status != 0) {
 		    			addCategoty(category_x);
+		    			refresh();
 		    		} 
 		    		
 		    		else {
 		    			footer_l.setText("Something Went Wrong");
 		    		}
 
-				} catch (SQLException e) {
+				} catch (SQLException | IOException e) {
 					e.printStackTrace();
 
 				}
@@ -381,10 +422,10 @@ public class RoomsController implements Initializable {
 		} else if(areEmpty()) {
 			footer_l.setText("Please Complete All Fields");
 		}
-		
 	}
 	
      public void loadSelectedRoom(int room_number) {
+    	 photo_x.setImage(null);
     	 
     	 try {
 			 
@@ -405,6 +446,11 @@ public class RoomsController implements Initializable {
 			     String smokingValue = selectedRoom.getString("smoking");
 			     int price =  selectedRoom.getInt("price_night");
 			     String currency = selectedRoom.getString("currency");
+			     Blob blob = selectedRoom.getBlob("photo");
+			     if(blob != null) {
+			     InputStream ins = blob.getBinaryStream();
+			     photo_x.setImage(new Image(ins));
+			     }
 			
 			     roomNo_x.setText(roomNo + "");
 			     category_x.setValue(category);
