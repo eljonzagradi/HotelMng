@@ -24,6 +24,8 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
@@ -34,9 +36,9 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -47,6 +49,7 @@ import javafx.stage.Stage;
 public class RoomsController implements Initializable {
 
 	//RoomView FXML Components:
+	@FXML private AnchorPane roomView;
 	@FXML private Label header_l;
 	@FXML private ImageView photo_x;
 	@FXML private TextField roomNo_x;
@@ -64,8 +67,8 @@ public class RoomsController implements Initializable {
 	@FXML private Label footer_l;
 	@FXML private Button submit_b;
 	@FXML private Button clear_b;
+	@FXML private Button clearImg_b;
 	
-	@FXML private BorderPane borderPane;
 	@FXML private ToggleButton viewAllRooms_b;
 	@FXML private ToggleButton viewAvailableRooms_b;
 	@FXML private ToggleGroup tg;
@@ -81,6 +84,7 @@ public class RoomsController implements Initializable {
 	ObservableList<String> currencies = FXCollections.observableArrayList("ALL", "EUR","USD","GPD");
 	LocalDate todayDate = LocalDate.now();
 	private Room activeSelection = null;
+	File file = null;
 	
 	public Room getActiveSelection() {
 		return activeSelection;
@@ -99,6 +103,7 @@ public class RoomsController implements Initializable {
 	
 	public void clickEdit() {
 		setDisable(false);
+		open_b.setDisable(true);
 		roomNo_x.setDisable(true);
 		submit_b.setDisable(false);
 	}
@@ -136,7 +141,7 @@ public class RoomsController implements Initializable {
 		
 	}
 	
-	File file = null;
+	
 	
 	public void clickSelectImage() {
 		
@@ -266,13 +271,20 @@ public class RoomsController implements Initializable {
 	public void clickRoom(Room room) {
 		setDisable(true);
 		loadSelectedRoom(room.getNumber());
+		submit_b.setDisable(true);
 		clear_b.setDisable(false);
 		open_b.setDisable(false);
 		edit_b.setDisable(false);
 	}
 	
+	public void clickClearImg() {
+		file = null;
+		photo_x.setImage(null);
+	}
+	
 	public void setDisable(boolean disable) {
 		imageSelector_b.setDisable(disable);
+		clearImg_b.setDisable(disable);
 		roomNo_x.setDisable(disable);
 		category_x.setDisable(disable);
 		capacity_x.setDisable(disable);
@@ -359,8 +371,13 @@ public class RoomsController implements Initializable {
 		    		
 		    		if(status != 0) {
 		    			addCategoty(category_x);
+		    			Alert alert = new Alert(AlertType.INFORMATION);
+		    			alert.setTitle("Information Dialog");
+		    			alert.setHeaderText(null);
+		    			alert.setContentText("Room Created Succesfully");
+		    			alert.showAndWait();
 		    			refresh();
-		    		} 
+		    			clickClear();		    		} 
 		    		
 		    		else {
 		    			footer_l.setText("Something Went Wrong");
@@ -378,7 +395,7 @@ public class RoomsController implements Initializable {
 				try {
 					
 					updateRoom = Database.con().prepareStatement
-							("UPDATE `hoteldatabase`.`rooms`\r\n"
+							("    UPDATE `hoteldatabase`.`rooms`\r\n"
 									+ "SET\r\n"
 									+ "`category` = ?,\r\n"
 									+ "`capacity` = ?,\r\n"
@@ -387,7 +404,6 @@ public class RoomsController implements Initializable {
 									+ "`smoking` = ?,\r\n"
 									+ "`price_night` = ?,\r\n"
 									+ "`currency` = ?\r\n"
-									+ "\r\n"
 									+ "WHERE `number` = ?;");
 					updateRoom.setString(1, category);
 					updateRoom.setInt(2, capacity);
@@ -398,20 +414,46 @@ public class RoomsController implements Initializable {
 					updateRoom.setString(7, currency);
 					updateRoom.setInt(8, roomNo);
 					
+					PreparedStatement updatePhoto = Database.con().prepareStatement(
+							"UPDATE `hoteldatabase`.`rooms`\r\n"
+							+ "SET\r\n"
+							+ "`photo` = ?\r\n"
+							+ "WHERE number = ?;");
+					Image image = photo_x.getImage();
+					
+					if(file != null) {
+						
+						FileInputStream f = new FileInputStream(file);
+						updatePhoto.setBinaryStream(1, f,f.available());
+						updatePhoto.setInt(2, roomNo);
+						updatePhoto.executeUpdate();
+					
+					} else if (file == null && image == null ) {
+						updatePhoto.setBinaryStream(1, null);
+						updatePhoto.setInt(2, roomNo);
+						updatePhoto.executeUpdate();
+					}
+										
 		    		int status = updateRoom.executeUpdate();
 		    		
 		    		if(status != 0) {
 		    			addCategoty(category_x);
+		    			Alert alert = new Alert(AlertType.INFORMATION);
+		    			alert.setTitle("Information Dialog");
+		    			alert.setHeaderText(null);
+		    			alert.setContentText("Room Updated Succesfully");
+		    			alert.showAndWait();
 		    			clickClear();
 		    			clickRoom(getActiveSelection());
 		    			refresh();
 		    			setActiveSelection(null);
+						file = null;
 	        			
 		    		} else {
 		    			footer_l.setText("Something Went Wrong");
 		    		}
 		    		
-				} catch (SQLException e) {
+				} catch (SQLException | IOException e) {
 					e.printStackTrace();
 				}
 				
@@ -450,11 +492,12 @@ public class RoomsController implements Initializable {
 			     int price =  selectedRoom.getInt("price_night");
 			     String currency = selectedRoom.getString("currency");
 			     Blob blob = selectedRoom.getBlob("photo");
+			     
 			     if(blob != null) {
 			     InputStream ins = blob.getBinaryStream();
 			     photo_x.setImage(new Image(ins));
 			     }
-			
+			     
 			     roomNo_x.setText(roomNo + "");
 			     category_x.setValue(category);
 			     capacity_x.setText(capacity + "");

@@ -33,18 +33,14 @@
             <ToggleGroup fx:id="tg" />
          </toggleGroup></ToggleButton>
       <ToggleButton fx:id="viewAvailableRooms_b" layoutX="81.0" layoutY="14.0" mnemonicParsing="false" onAction="#refresh" text="View Available" toggleGroup="$tg" />
-      <Button fx:id="addRoom_b" layoutX="504.0" layoutY="14.0" mnemonicParsing="false" onAction="#clickAdd" prefHeight="25.0" prefWidth="110.0" text="Create Room" />
-      <AnchorPane layoutX="643.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="280.0">
+      <Button fx:id="addRoom_b" layoutX="519.0" layoutY="14.0" mnemonicParsing="false" onAction="#clickAdd" prefHeight="25.0" prefWidth="110.0" text="Create Room" />
+      <AnchorPane fx:id="roomView" layoutX="643.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="280.0">
          <children>
             <Label fx:id="header_l" alignment="CENTER" layoutX="15.0" layoutY="14.0" prefHeight="40.0" prefWidth="250.0" text="Room Details:">
                <font>
                   <Font name="System Bold Italic" size="15.0" />
                </font>
             </Label>
-            <ImageView fx:id="photo_x" fitHeight="140.0" fitWidth="250.0" layoutX="15.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true">
-               <viewport>
-                  <Rectangle2D />
-               </viewport></ImageView>
             <TextField fx:id="roomNo_x" alignment="CENTER" layoutX="131.0" layoutY="239.0" prefHeight="30.0" prefWidth="132.0">
                <font>
                   <Font name="System Bold Italic" size="14.0" />
@@ -122,7 +118,17 @@
                </font></Button>
             <Button fx:id="clear_b" disable="true" layoutX="191.0" layoutY="554.0" mnemonicParsing="false" onAction="#clickClear" prefHeight="25.0" prefWidth="75.0" text="Clear" />
             <Button fx:id="edit_b" disable="true" layoutX="106.0" layoutY="554.0" mnemonicParsing="false" onAction="#clickEdit" prefHeight="25.0" prefWidth="75.0" text="Edit" />
-            <Button fx:id="imageSelector_b" disable="true" layoutX="19.0" layoutY="202.0" mnemonicParsing="false" onAction="#clickSelectImage" prefHeight="17.0" prefWidth="250.0" text="Attach Image" />
+            <Button fx:id="imageSelector_b" disable="true" layoutX="19.0" layoutY="202.0" mnemonicParsing="false" onAction="#clickSelectImage" prefHeight="25.0" prefWidth="157.0" text="Attach Image" />
+            <HBox alignment="CENTER" layoutY="54.0" prefHeight="140.0" prefWidth="280.0">
+               <children>
+                  <ImageView fx:id="photo_x" fitHeight="140.0" fitWidth="250.0" pickOnBounds="true" preserveRatio="true">
+                     <viewport>
+                        <Rectangle2D />
+                     </viewport>
+                  </ImageView>
+               </children>
+            </HBox>
+            <Button fx:id="clearImg_b" alignment="CENTER" disable="true" layoutX="183.0" layoutY="202.0" mnemonicParsing="false" onAction="#clickClearImg" prefHeight="25.0" prefWidth="81.0" text="Clear Image" />
          </children>
       </AnchorPane>
    </children>
