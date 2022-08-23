@@ -636,13 +636,15 @@ public class CalendarController implements Initializable {
         }
         
         for (DayNode dateCell : allCalendarDays) {
-        	
+
         	String txt = String.valueOf(calendarDate.getDayOfMonth());
         	dateCell.setDate(calendarDate);
-        	
         	dateCell.setText(txt);
+        	if(calendarDate.getMonthValue() != m) {
+        		dateCell.setText(null);
+        		
+        	}
     		dateCell.setDisable(false);
-    		
     		selectionHandler(dateCell);
         	select(dateCell);
         	
@@ -750,7 +752,7 @@ public void selectionHandler(DayNode dateCell) {
 						busyDates.removeAll(temp);
 					}
     				
-    				if(!busyDates.contains(selected.getDate())) 
+    				if(!busyDates.contains(selected.getDate()) && selected.getText() != null) 
     				
     				{
     					
