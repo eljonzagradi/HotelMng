@@ -29,6 +29,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -50,6 +51,7 @@ public class CalendarController implements Initializable {
 	@FXML private TableColumn<Reservation,Date> checkin_c;
 	@FXML private TableColumn<Reservation,Date> checkout_c;
 	@FXML private TableColumn<Reservation,Number> totalPrice_c;
+	@FXML private TableColumn<Reservation,String> currency_c;
 	@FXML private TableColumn<Reservation,Timestamp> createdAt_c;
 	@FXML private TableColumn<Reservation,Number> phone_c;
 	
@@ -81,8 +83,13 @@ public class CalendarController implements Initializable {
     @FXML private Label errorsDisplay;
     @FXML private ToggleButton modify_b;
     @FXML private Button update_b;
+    
+	@FXML private TextField price_night_x;
+	@FXML private ChoiceBox<String> currency_x;
+	@FXML private Label displayCurrency_l;
         
     //New Reservation variables:
+	ObservableList<String> currencies = FXCollections.observableArrayList("ALL", "EUR","USD","GPD");
 	ObservableList<Reservation> reservations = FXCollections.observableArrayList();
 	ObservableList<LocalDate> busyDates = FXCollections.observableArrayList();
 	ObservableList<LocalDate> checkins = FXCollections.observableArrayList();
@@ -96,7 +103,8 @@ public class CalendarController implements Initializable {
     private LocalDate  checkout;
 	private long totalPrice;
 	public static int priceNight;
-	public static int selectedRoom; 
+	public static int selectedRoom;
+	public static String tempCurrency;
     private DayNode lastSelected = null;
 
 ////////////////////////////////////////////////////////    
@@ -138,6 +146,9 @@ public class CalendarController implements Initializable {
 	public void setTotalPrice(long totalPrice) {
 		this.totalPrice = totalPrice;
 	}
+	public void setPriceNight() {
+		priceNight = Integer.parseInt(price_night_x.getText());
+	}
 	
 /////////////////////////////////////////////////////////
 	
@@ -151,8 +162,8 @@ public class CalendarController implements Initializable {
 						
 						Database.con().prepareStatement
 						("INSERT INTO `hoteldatabase`.`reservations` "
-						+ "(`number`, `name`, `lastname`, `phone_number`, `check_in`, `check_out`, `total_price`, `created_at`)"
-					    + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?);");
+						+ "(`number`, `name`, `lastname`, `phone_number`, `check_in`, `check_out`, `total_price`, `currency`, `created_at`)"
+					    + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?);");
 				
 				create.setInt(1, getSelectedRoom());
 				create.setString(2, name_x.getText());
@@ -161,7 +172,8 @@ public class CalendarController implements Initializable {
 				create.setDate(5, java.sql.Date.valueOf(getCheckin()));
 				create.setDate(6, java.sql.Date.valueOf(getCheckout()));
 				create.setLong(7, Long.parseLong(totalPrice_x.getText()));
-				create.setTimestamp(8,  Timestamp.valueOf(LocalDateTime.now()));
+				create.setString(8, displayCurrency_l.getText());
+				create.setTimestamp(9,  Timestamp.valueOf(LocalDateTime.now()));
 				
 				create.executeUpdate();
 	            clickClear();
@@ -228,6 +240,7 @@ public class CalendarController implements Initializable {
 			String checkinBefore = selectedItem.getCheckin().get().toLocalDate().toString();
 			String checkoutBefore = selectedItem.getCheckout().get().toLocalDate().toString();
 			String totalPriceBefore = Long.toString(selectedItem.getTotalPrice().get());
+			String currencyBefore = selectedItem.getCurrency().get();
 			String timestampBefore = selectedItem.getCreatedat().get().toString();
 			
 			String reservationBefore = 
@@ -238,6 +251,7 @@ public class CalendarController implements Initializable {
 				   + "| Check-in: " + checkinBefore
 				   + "| Check-out: " + checkoutBefore
 				   + "| TotalPrice " + totalPriceBefore
+				   + "| Currency " + currencyBefore
 				   + "| DateOfCreation " + timestampBefore;
 			
 			name_x.setText(nameBefore);
@@ -257,6 +271,7 @@ public class CalendarController implements Initializable {
 					Date checkinAfter = java.sql.Date.valueOf(checkin_x.getText());
 					Date checkoutAfter = java.sql.Date.valueOf(checkout_x.getText());
 					Long totalPriceAfter = Long.parseLong(totalPrice_x.getText());
+					String currencyAfter = displayCurrency_l.getText();
 					Timestamp timestampAfter = Timestamp.valueOf(LocalDateTime.now());
 					
 					String reservationAfter = 
@@ -266,7 +281,8 @@ public class CalendarController implements Initializable {
 						   + "| Tel: " + phoneNumAfter
 						   + "| Check-in: " + checkinAfter
 						   + "| Check-out: " + checkoutAfter
-						   + "| TotalPrice " + totalPriceAfter;
+						   + "| TotalPrice " + totalPriceAfter
+					       + "| Currency " + currencyAfter;
 						
 				 try {
 						PreparedStatement update = 
@@ -279,6 +295,7 @@ public class CalendarController implements Initializable {
 										+ "check_in = ?,\r\n"
 										+ "check_out = ?,\r\n"
 										+ "total_price = ?,\r\n"
+										+ "currency = ?,\r\n"
 										+ "created_at = ?\r\n"
 										+ "WHERE\r\n"
 										+ "id_reservation = ?;");
@@ -329,6 +346,12 @@ public class CalendarController implements Initializable {
 	public void someInitalValues() {
 		
 		update_b.setDisable(true);
+		currency_x.setItems(currencies);
+		currency_x.setValue(tempCurrency);
+		displayCurrency_l.setText(tempCurrency);
+		currency_x.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			displayCurrency_l.setText(newValue);
+		});
 		
 		modify_b.selectedProperty().addListener
 		( e -> {
@@ -384,6 +407,9 @@ public class CalendarController implements Initializable {
 		setCheckout_b.setToggleGroup(toggleGR);
 		setCheckin_b.setSelected(true);
 		room_x.setText("ROOM: " + getSelectedRoom());
+		price_night_x.setText(priceNight+"");
+		
+		
 		
 		
 		
@@ -434,12 +460,13 @@ public class CalendarController implements Initializable {
 	    			
 	    			String reservation = 
 	    					 "Id: "  + selectedItem.getReservationId()
-	    				   + "| Name:  " + selectedItem.getName().get() 
+	    				   + "| Name:  " + selectedItem.getName().get()
 	    				   + "| LastName: " + selectedItem.getLastName().get()
 	    				   + "| Tel: " + selectedItem.getPhoneNum().get()
 	    				   + "| Check-in: " + selectedItem.getCheckin().get()
 	    				   + "| Check-out: " + selectedItem.getCheckout().get()
 	    				   + "| TotalPrice " + selectedItem.getTotalPrice().get()
+	    				   + "| Currency " + selectedItem.getCurrency().get()
 	    				   + "| DateOfCreation " + selectedItem.getCreatedat().get();
 	    			
 	    			deleteLogs.setString(1, reservation);
@@ -466,13 +493,13 @@ public class CalendarController implements Initializable {
 		long price = 0;
     	long daysNo = 0;
     	
-    	if(checkin != null && checkout != null) {
+    	if(checkin != null && checkout != null && price_night_x.getText().trim() !=null) {
     		
     		daysNo = Duration.between(
     				checkin.atStartOfDay(), 
     				checkout.atStartOfDay()).toDays();
-    		
-    				price = getPriceNight() * daysNo;
+    		setPriceNight();
+    		price = getPriceNight() * daysNo;
     	}
     	
     	return price;
@@ -527,6 +554,7 @@ public class CalendarController implements Initializable {
 		checkin_c.setCellValueFactory(checkin -> checkin.getValue().getCheckin());
 		checkout_c.setCellValueFactory(checkout -> checkout.getValue().getCheckout());
 		totalPrice_c.setCellValueFactory(totalPrice -> totalPrice.getValue().getTotalPrice());
+		currency_c.setCellValueFactory(currency -> currency.getValue().getCurrency() );
 		createdAt_c.setCellValueFactory(createdat -> createdat.getValue().getCreatedat());
 		
 		loadDataFromDB();
@@ -553,6 +581,7 @@ public class CalendarController implements Initializable {
 		    	Date checkin  = resultSet.getDate("check_in");
 		    	Date checkout  = resultSet.getDate("check_out");
 		    	int totalPrice  = resultSet.getInt("total_price");
+		    	String currency = resultSet.getString("currency");
 		    	Timestamp timestamp = resultSet.getTimestamp("created_at");
 		    	
 		    	reservations.add(
@@ -565,6 +594,7 @@ public class CalendarController implements Initializable {
 		    				    checkin,
 		    					checkout,
 		    					totalPrice,
+		    					currency,
 		    					timestamp
 		    					));
 		    	
@@ -638,11 +668,11 @@ public class CalendarController implements Initializable {
         for (DayNode dateCell : allCalendarDays) {
 
         	String txt = String.valueOf(calendarDate.getDayOfMonth());
+        	dateCell.setVisible(true);
         	dateCell.setDate(calendarDate);
         	dateCell.setText(txt);
         	if(calendarDate.getMonthValue() != m) {
-        		dateCell.setText(null);
-        		
+            	dateCell.setVisible(false);	
         	}
     		dateCell.setDisable(false);
     		selectionHandler(dateCell);
@@ -815,6 +845,10 @@ public void selectionHandler(DayNode dateCell) {
 
    	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		price_night_x.textProperty().addListener( e -> {
+			setTotalPrice(calcPrice(getCheckin(),getCheckout()));
+			totalPrice_x.setText(Long.toString(getTotalPrice()));
+		});
 		tableSetup();
 		someInitalValues();
 		CalendarView(YearMonth.now());

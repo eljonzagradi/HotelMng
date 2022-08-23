@@ -17,6 +17,7 @@ public class Reservation {
 	private ObjectProperty<Date>  checkin;
 	private ObjectProperty<Date> checkout;
 	private LongProperty totalPrice;
+	private SimpleStringProperty currency;
 	private ObjectProperty<Timestamp> createdat;
 	private SimpleIntegerProperty roomNum;
 	private LongProperty phoneNum;
@@ -31,6 +32,7 @@ public class Reservation {
 			Date checkin,
 			Date checkout,
 			long totalPrice,
+			String currency,
 			Timestamp createdat
 			) 
 	{
@@ -42,6 +44,7 @@ public class Reservation {
         this.checkin = new SimpleObjectProperty<Date>(checkin);
         this.checkout = new SimpleObjectProperty<Date>(checkout);
         this.totalPrice = new SimpleLongProperty(totalPrice);
+		this.currency = new SimpleStringProperty(currency);
         this.createdat = new SimpleObjectProperty<Timestamp>(createdat);
 	}
 
@@ -79,5 +82,9 @@ public class Reservation {
 
 	public LongProperty getPhoneNum() {
 		return phoneNum;
+	}
+
+	public StringProperty getCurrency() {
+		return currency;
 	}
 }

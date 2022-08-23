@@ -23,6 +23,7 @@ public class Room  extends Label {
 	private SimpleIntegerProperty price;
 	private SimpleStringProperty currency;
 	private Image photo;
+	private boolean busy;
 	
 	public Room(int room_id, int number,String category,int capacity,String ac,
 			    String view,String smoking, int price,String currency, Image photo) {	
@@ -38,14 +39,15 @@ public class Room  extends Label {
 		this.currency = new SimpleStringProperty(currency);;
 		this.photo = photo;
 		
+		
         this.setAlignment(Pos.CENTER);
         this.setMaxHeight(300);
         this.setMaxWidth(300);
-        this.setFont(new Font("Arial", 20));
-		this.setBackground(new Background(
+        this.setBackground(new Background(
 				new BackgroundFill(Color.AQUA,
 						new CornerRadii(0),
 						new Insets(0))));
+        this.setFont(new Font("Arial", 20));
 		this.setStyle("-fx-border-color: white;");
 		this.setText(  "ROOM:" +number+"\n");
 	}
@@ -88,5 +90,13 @@ public class Room  extends Label {
 
 	public Image getPhoto() {
 		return photo;
+	}
+
+	public boolean isBusy() {
+		return busy;
+	}
+
+	public void setBusy(boolean busy) {
+		this.busy = busy;
 	}
 }

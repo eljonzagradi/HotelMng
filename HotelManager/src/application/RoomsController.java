@@ -77,11 +77,12 @@ public class RoomsController implements Initializable {
 	@FXML private Button open_b;
 	@FXML private GridPane roomLayout;
 	@FXML private Button imageSelector_b;
-	
+	@FXML private Label isBusy_l;
 	List<Integer> roomList = new ArrayList<Integer>();
 	ObservableList<String> categories = FXCollections.observableArrayList();
 	ObservableList<String> views = FXCollections.observableArrayList("Mountain View", "Sea View", "City View" , "No View");
 	ObservableList<String> currencies = FXCollections.observableArrayList("ALL", "EUR","USD","GPD");
+	ObservableList<Room> allRoomsList = FXCollections.observableArrayList();
 	LocalDate todayDate = LocalDate.now();
 	private Room activeSelection = null;
 	File file = null;
@@ -119,6 +120,7 @@ public class RoomsController implements Initializable {
 		
 		CalendarController.selectedRoom = Integer.parseInt(roomNo_x.getText());
 		CalendarController.priceNight = Integer.parseInt(price_night_x.getText());
+		CalendarController.tempCurrency = currency_x.getValue();
 		
 		Stage stage =  (Stage) open_b.getScene().getWindow();
 		stage.close();
@@ -172,6 +174,7 @@ public class RoomsController implements Initializable {
 		int rowInx = 0;
 		int columnInx = 0;
 		ResultSet resultSet = null;
+		Room room = null;
 		
 		try {
 			PreparedStatement availableRooms = Database.con().prepareStatement
@@ -202,6 +205,8 @@ public class RoomsController implements Initializable {
 					 resultSet = availableRooms.executeQuery();
 			}
 			
+			 
+			
 			while(resultSet.next()) {
 				
 				Date checkin = resultSet.getDate("check_in");
@@ -218,13 +223,18 @@ public class RoomsController implements Initializable {
 			    String currency = resultSet.getString("currency");
 			    
 			      
-			    Room room = new Room (
+			    room = new Room (
 			    		roomID, roomNo, category,
 			    		capacity, acValue, view,
 			    		smokingValue, price, currency,
 			    		null);
-			    selectRoom(room);
 			    
+			    
+
+			    selectRoom(room);
+    			room.setBusy(false);
+
+	    
 			    if(!roomList.contains(roomNo)) {
 
 			    	if(checkin !=null || checkout !=null ) {
@@ -232,13 +242,13 @@ public class RoomsController implements Initializable {
 			    		if(checkin.toLocalDate().compareTo(todayDate)
 			    				* todayDate.compareTo(checkout.toLocalDate()) >= 0) {
 			    			
-			    			room.setBackground(new Background(
-			    					new BackgroundFill(
-			    							Color.RED,
-					    					new CornerRadii(0),
-					    					new Insets(0))));
+			    			room.setBusy(true);
+			    			roomBusy(room);
 			    			}
 			    		}
+			    	
+			    	
+			    	
 				    roomLayout.add(room, columnInx, rowInx);				    
 				    if(columnInx < 3) {
 				    	++columnInx;
@@ -250,6 +260,8 @@ public class RoomsController implements Initializable {
 				    		}
 				    }
 		    	roomList.add(roomNo);
+		    	allRoomsList.add(room);
+
 			}
 
 			
@@ -262,15 +274,49 @@ public class RoomsController implements Initializable {
 	 }
 	
 	public void selectRoom(Room room) {
-		room.setOnMouseClicked( e -> {
-			setActiveSelection(room);
+		room.setOnMouseClicked( e -> { 
 			clickRoom(room);
 		});
 	}
 	
+	public void roomBusy(Room r) {
+		if(r.isBusy() == true) {
+			r.setBackground(new Background(
+					new BackgroundFill(Color.RED,
+							new CornerRadii(0),
+							new Insets(0))));
+
+		}
+	}
+	
 	public void clickRoom(Room room) {
+
 		setDisable(true);
-		loadSelectedRoom(room.getNumber());
+		loadSelectedRoom(room);	
+		setActiveSelection(room);
+
+		for(Room r : allRoomsList) {
+			
+			r.setBackground(new Background(
+					new BackgroundFill(Color.AQUA,
+							new CornerRadii(0),
+							new Insets(0))));
+					
+			roomBusy(r);
+
+			if(getActiveSelection().getNumber() == r.getNumber() )
+			{
+				r.setBackground(new Background(
+						new BackgroundFill(Color.GREEN,
+								new CornerRadii(0),
+								new Insets(0))));
+			     
+			}
+			
+
+
+		}
+		
 		submit_b.setDisable(true);
 		clear_b.setDisable(false);
 		open_b.setDisable(false);
@@ -316,7 +362,8 @@ public class RoomsController implements Initializable {
 		price_night_x.clear();
 		footer_l.setText(null);
 		photo_x.setImage(null);
-		
+		setActiveSelection(null);
+		isBusy_l.setText(null);
 		submit_b.setDisable(true);
 		clear_b.setDisable(true);
 		open_b.setDisable(true);
@@ -469,8 +516,9 @@ public class RoomsController implements Initializable {
 		}
 	}
 	
-     public void loadSelectedRoom(int room_number) {
+     public void loadSelectedRoom(Room r) {
     	 photo_x.setImage(null);
+    	 int room_number = r.getNumber();
     	 
     	 try {
 			 
@@ -514,14 +562,24 @@ public class RoomsController implements Initializable {
 			    		 }
 			     price_night_x.setText(price + "");
 			     currency_x.setValue(currency);
-			     }
+
+			     
+			 }
 			 
 		 } catch (SQLException e) {
 			 e.printStackTrace();
 			 
 		 }
+
     	 refresh();
-	 
+    	 if(r.isBusy()) {
+			isBusy_l.setTextFill(Color.RED);
+			isBusy_l.setText("Room is currently busy");
+    	 } else {
+ 			isBusy_l.setTextFill(Color.GREEN);
+ 			isBusy_l.setText("Room is free");;
+
+    	 }
 }
      
      public boolean areEmpty() {
@@ -598,6 +656,8 @@ public class RoomsController implements Initializable {
 		    if (newVal == null)
 		        oldVal.setSelected(true);
 		});
+		
+
 		viewAllRooms_b.setSelected(true);
 		loadRooms();
 

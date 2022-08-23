@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="653.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RoomsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="685.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RoomsController">
    <children>
-      <ScrollPane fitToWidth="true" layoutX="14.0" layoutY="47.0" prefHeight="591.0" prefWidth="615.0">
+      <ScrollPane fitToWidth="true" layoutX="14.0" layoutY="47.0" prefHeight="632.0" prefWidth="615.0" AnchorPane.rightAnchor="308.0" AnchorPane.topAnchor="45.0">
          <content>
             <GridPane fx:id="roomLayout" alignment="CENTER" hgap="10.0" vgap="10.0">
               <columnConstraints>
@@ -28,13 +28,13 @@
             </GridPane>
          </content>
       </ScrollPane>
-      <ToggleButton fx:id="viewAllRooms_b" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#refresh" text="View All">
+      <ToggleButton fx:id="viewAllRooms_b" layoutX="14.0" layoutY="28.0" mnemonicParsing="false" onAction="#refresh" text="View All" AnchorPane.rightAnchor="864.0" AnchorPane.topAnchor="15.0">
          <toggleGroup>
             <ToggleGroup fx:id="tg" />
          </toggleGroup></ToggleButton>
-      <ToggleButton fx:id="viewAvailableRooms_b" layoutX="81.0" layoutY="14.0" mnemonicParsing="false" onAction="#refresh" text="View Available" toggleGroup="$tg" />
-      <Button fx:id="addRoom_b" layoutX="519.0" layoutY="14.0" mnemonicParsing="false" onAction="#clickAdd" prefHeight="25.0" prefWidth="110.0" text="Create Room" />
-      <AnchorPane fx:id="roomView" layoutX="643.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="280.0">
+      <ToggleButton fx:id="viewAvailableRooms_b" layoutX="85.0" layoutY="14.0" mnemonicParsing="false" onAction="#refresh" text="View Available" toggleGroup="$tg" AnchorPane.rightAnchor="759.0" AnchorPane.topAnchor="15.0" />
+      <Button fx:id="addRoom_b" layoutX="519.0" layoutY="14.0" mnemonicParsing="false" onAction="#clickAdd" prefHeight="25.0" prefWidth="110.0" text="Create Room" AnchorPane.rightAnchor="308.0" AnchorPane.topAnchor="15.0" />
+      <AnchorPane fx:id="roomView" layoutX="643.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="671.0" prefWidth="280.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
          <children>
             <Label fx:id="header_l" alignment="CENTER" layoutX="15.0" layoutY="14.0" prefHeight="40.0" prefWidth="250.0" text="Room Details:">
                <font>
@@ -118,7 +118,7 @@
                </font></Button>
             <Button fx:id="clear_b" disable="true" layoutX="191.0" layoutY="554.0" mnemonicParsing="false" onAction="#clickClear" prefHeight="25.0" prefWidth="75.0" text="Clear" />
             <Button fx:id="edit_b" disable="true" layoutX="106.0" layoutY="554.0" mnemonicParsing="false" onAction="#clickEdit" prefHeight="25.0" prefWidth="75.0" text="Edit" />
-            <Button fx:id="imageSelector_b" disable="true" layoutX="19.0" layoutY="202.0" mnemonicParsing="false" onAction="#clickSelectImage" prefHeight="25.0" prefWidth="157.0" text="Attach Image" />
+            <Button fx:id="imageSelector_b" disable="true" layoutX="19.0" layoutY="202.0" mnemonicParsing="false" onAction="#clickSelectImage" prefHeight="25.0" prefWidth="132.0" text="Attach Image" />
             <HBox alignment="CENTER" layoutY="54.0" prefHeight="140.0" prefWidth="280.0">
                <children>
                   <ImageView fx:id="photo_x" fitHeight="140.0" fitWidth="250.0" pickOnBounds="true" preserveRatio="true">
@@ -128,7 +128,12 @@
                   </ImageView>
                </children>
             </HBox>
-            <Button fx:id="clearImg_b" alignment="CENTER" disable="true" layoutX="183.0" layoutY="202.0" mnemonicParsing="false" onAction="#clickClearImg" prefHeight="25.0" prefWidth="81.0" text="Clear Image" />
+            <Button fx:id="clearImg_b" alignment="CENTER" disable="true" layoutX="154.0" layoutY="202.0" mnemonicParsing="false" onAction="#clickClearImg" prefHeight="25.0" prefWidth="110.0" text="Clear Image" />
+            <Label fx:id="isBusy_l" alignment="CENTER" contentDisplay="CENTER" layoutX="15.0" layoutY="628.0" prefHeight="31.0" prefWidth="250.0">
+               <font>
+                  <Font name="System Bold Italic" size="20.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </children>

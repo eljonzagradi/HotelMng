@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="658.0" prefWidth="927.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.CalendarController">
+<AnchorPane prefHeight="658.0" prefWidth="935.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.CalendarController">
    <children>
       <VBox fx:id="view" layoutX="59.0" layoutY="31.0" prefHeight="378.0" prefWidth="535.0" spacing="5.0" AnchorPane.leftAnchor="59.0">
          <children>
@@ -110,7 +110,7 @@
             </GridPane>
          </children>
       </VBox>
-      <TableView fx:id="reservationsTable" layoutX="10.0" layoutY="425.0" prefHeight="220.0" prefWidth="635.0" AnchorPane.leftAnchor="10.0">
+      <TableView fx:id="reservationsTable" layoutX="10.0" layoutY="425.0" prefHeight="220.0" prefWidth="694.0" AnchorPane.leftAnchor="10.0">
          <columns>
             <TableColumn fx:id="name_c" editable="false" maxWidth="100.0" minWidth="-1.0" prefWidth="64.0" text="Name" />
             <TableColumn fx:id="lastname_c" editable="false" maxWidth="131.0" minWidth="-1.0" prefWidth="77.0" text="Last Name" />
@@ -118,10 +118,11 @@
             <TableColumn fx:id="checkin_c" editable="false" maxWidth="188.0" minWidth="-1.0" prefWidth="84.0" text="Check-in" />
             <TableColumn fx:id="checkout_c" editable="false" maxWidth="222.0" minWidth="-1.0" prefWidth="108.0" text="Check-out" />
             <TableColumn fx:id="totalPrice_c" editable="false" maxWidth="198.0" minWidth="-1.0" prefWidth="95.0" text="Total Price" />
-            <TableColumn fx:id="createdAt_c" editable="false" maxWidth="366.0" minWidth="-1.0" prefWidth="120.0" text="Created At" />
+            <TableColumn fx:id="currency_c" prefWidth="59.0" text="Currency" />
+            <TableColumn fx:id="createdAt_c" editable="false" maxWidth="366.0" minWidth="-1.0" prefWidth="136.0" text="Created At" />
          </columns>
       </TableView>
-      <VBox alignment="CENTER" layoutX="693.0" layoutY="105.0" prefHeight="430.0" prefWidth="200.0" spacing="5.0">
+      <VBox alignment="CENTER" layoutX="727.0" layoutY="71.0" prefHeight="516.0" prefWidth="200.0" spacing="5.0">
          <children>
             <Button fx:id="changeRoom_b" mnemonicParsing="false" onAction="#clickChangeRoom" prefHeight="35.0" prefWidth="200.0" text="Change Room">
                <font>
@@ -228,19 +229,34 @@
                      </graphic></ToggleButton>
                </children>
             </HBox>
+            <HBox prefHeight="47.0" prefWidth="200.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="84.0" text="Price/Night:">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="price_night_x" alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="75.0">
+                     <font>
+                        <Font name="System Bold Italic" size="14.0" />
+                     </font>
+                  </TextField>
+                  <ChoiceBox fx:id="currency_x" prefHeight="40.0" prefWidth="59.0" />
+               </children>
+            </HBox>
             <HBox prefHeight="40.0" prefWidth="235.0" spacing="2.0">
                <children>
-                  <Label prefHeight="40.0" prefWidth="40.0" text="Price:">
+                  <Label prefHeight="40.0" prefWidth="47.0" text="Total:">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="totalPrice_x" alignment="CENTER" prefHeight="40.0" prefWidth="119.0">
+                  <TextField fx:id="totalPrice_x" alignment="CENTER" prefHeight="40.0" prefWidth="120.0">
                      <font>
                         <Font name="System Bold Italic" size="15.0" />
                      </font>
                   </TextField>
-                  <Label prefHeight="40.0" prefWidth="30.0" text="LEK">
+                  <Label fx:id="displayCurrency_l" prefHeight="40.0" prefWidth="30.0">
                      <font>
                         <Font name="System Bold Italic" size="13.0" />
                      </font>
