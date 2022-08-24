@@ -178,7 +178,7 @@ public class RoomsController implements Initializable {
 		
 		try {
 			PreparedStatement availableRooms = Database.con().prepareStatement
-			("SELECT number, id_room, category, capacity, air_c, view, smoking, price_night, currency, photo, check_in, check_out\r\n"
+			("SELECT *\r\n"
 			+ "FROM  hoteldatabase.rooms ro\r\n"
 			+ "LEFT JOIN hoteldatabase.reservations r\r\n"
 			+ "USING (number)\r\n"
@@ -204,8 +204,6 @@ public class RoomsController implements Initializable {
 			else if( viewAvailableRooms_b.isSelected()) {
 					 resultSet = availableRooms.executeQuery();
 			}
-			
-			 
 			
 			while(resultSet.next()) {
 				
@@ -292,8 +290,9 @@ public class RoomsController implements Initializable {
 	public void clickRoom(Room room) {
 
 		setDisable(true);
-		loadSelectedRoom(room);	
 		setActiveSelection(room);
+		loadSelectedRoom(getActiveSelection());	
+		
 
 		for(Room r : allRoomsList) {
 			
@@ -344,9 +343,11 @@ public class RoomsController implements Initializable {
 	}
 	
 	public  void refresh() {
+
 		roomLayout.getChildren().clear();
 		roomList.clear();
-		loadRooms();		
+		loadRooms();
+
 	}
 	
 	public void clickClear() {

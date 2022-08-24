@@ -27,3 +27,16 @@
 
     -fx-font-family: verdana;  
 }
+
+.combo-box:disabled, .combo-box:disabled > * {
+  -fx-opacity: 0.8 ;
+}
+.choice-box:disabled, .choice-box:disabled > * {
+  -fx-opacity: 0.8 ;
+}
+.text-field:disabled, .text-field:disabled > * {
+  -fx-opacity: 0.8 ;
+}
+.radio-button:disabled, .radio-button:disabled > * {
+  -fx-opacity: 0.8 ;
+}

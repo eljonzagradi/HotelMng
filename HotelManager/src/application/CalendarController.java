@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -81,7 +80,7 @@ public class CalendarController implements Initializable {
     @FXML private Button deleteReservation;
     @FXML private TextField phonenum_x;
     @FXML private Label errorsDisplay;
-    @FXML private ToggleButton modify_b;
+    @FXML private Button edit_b;
     @FXML private Button update_b;
     
 	@FXML private TextField price_night_x;
@@ -94,9 +93,8 @@ public class CalendarController implements Initializable {
 	ObservableList<LocalDate> busyDates = FXCollections.observableArrayList();
 	ObservableList<LocalDate> checkins = FXCollections.observableArrayList();
 	ObservableList<LocalDate> temp = FXCollections.observableArrayList();
-
-
 	List<LocalDate> listOfDates = null;
+	Reservation activeReservation = null;
 
     ToggleGroup toggleGR = new ToggleGroup();
     private LocalDate checkin;
@@ -193,6 +191,8 @@ public class CalendarController implements Initializable {
 	}
 
 	public void clickClear() {
+		setCheckin(null);
+		setCheckout(null);
 		name_x.clear();
 		lastName_x.clear();
 		checkin_x.setText(null);
@@ -201,18 +201,22 @@ public class CalendarController implements Initializable {
 		phonenum_x.setText(null);
 		setCheckin_b.setSelected(true);
 		errorsDisplay.setText(null);
-		setCheckin(null);
-		setCheckout(null);
+		currency_x.setValue(tempCurrency);
+		price_night_x.setText(priceNight+"");
+		edit_b.setDisable(true);
+		update_b.setDisable(true);
+		create_b.setDisable(false);
+		deleteReservation.setDisable(true);
+		setDisable(false);
 		
-		if(modify_b.isSelected()) {	
-			modify_b.setSelected(false);
-			update_b.setDisable(true);
-			create_b.setDisable(false);
-		}
 		temp.clear();
-	    refresh();
-		
-
+		reservations.clear();
+        busyDates.clear();
+        checkins.clear();
+	    allCalendarDays.clear();
+	    calendar.getChildren().clear();
+		loadDataFromDB();
+		CalendarView(YearMonth.now());
 	}
 	
 	public void refresh() {
@@ -221,47 +225,102 @@ public class CalendarController implements Initializable {
         checkins.clear();
 		loadDataFromDB();
 		populateCalendar(currentYearMonth);
+		
 	}
 	
-	public void selectModify() {
+	
+	public void clickReservation() {
+    
+		reservationsTable.setOnMouseClicked( event -> {
+			int m2 = 0;
+			setCheckin(null);
+			setCheckout(null);
+			temp.clear();
 
-		Reservation selectedItem = 
-				reservationsTable.getSelectionModel().getSelectedItem();
+			Reservation	selectedItem = reservationsTable.getSelectionModel().getSelectedItem();
+			activeReservation = selectedItem;
+			if(selectedItem != null) {
+				int m1 = currentYearMonth.getMonthValue();
+				m2 = selectedItem.getCheckin().get().toLocalDate().getMonthValue();
+				
+				while(m2 != m1 ) {
+					if(m1 < m2) {
+						nextMonth();
+						m1++;
+					} else {
+						previousMonth();
+						m1--;
+					}
+					
+				}
+				
+				deleteReservation.setDisable(false);
+				create_b.setDisable(true);
+				update_b.setDisable(true);
+				setDisable(true);
+				edit_b.setDisable(false);				
+				LocalDate start = selectedItem.getCheckin().get().toLocalDate();
+				LocalDate end = selectedItem.getCheckout().get().toLocalDate();
+				List<LocalDate>	l = start.datesUntil(end)
+						.collect(Collectors.toList());
+				
+				temp.addAll(l);
+				populateCalendar(currentYearMonth);
+				
+
+				
+				int id = selectedItem.getReservationId();			
+				String nameBefore = selectedItem.getName().get();
+				String lastnameBefore = selectedItem.getLastName().get();
+				String phoneNumBefore = Long.toString(selectedItem.getPhoneNum().get());
+				LocalDate checkinBefore = selectedItem.getCheckin().get().toLocalDate();
+				LocalDate checkoutBefore = selectedItem.getCheckout().get().toLocalDate();
+				long totalPriceBefore = selectedItem.getTotalPrice().get();
+				String currencyBefore = selectedItem.getCurrency().get();
+				String timestampBefore = selectedItem.getCreatedat().get().toString();
+				
+				long    daysNo = Duration.between(
+						checkinBefore.atStartOfDay(), 
+						checkoutBefore.atStartOfDay()).toDays();
+				long priceNightBefore = totalPriceBefore/daysNo;
+				
+				
+				String reservationBefore = 
+						 "Id: "  + id
+					   + "| Name:  " + nameBefore 
+					   + "| LastName: " + lastnameBefore
+					   + "| Tel: " + phoneNumBefore
+					   + "| Check-in: " + checkinBefore
+					   + "| Check-out: " + checkoutBefore
+					   + "| TotalPrice " + totalPriceBefore
+					   + "| Currency " + currencyBefore
+					   + "| DateOfCreation " + timestampBefore;
+				
+				name_x.setText(nameBefore);
+				lastName_x.setText(lastnameBefore);
+				phonenum_x.setText(phoneNumBefore);
+				checkin_x.setText(checkinBefore.toString());
+				checkout_x.setText(checkoutBefore.toString());
+				price_night_x.setText(Long.toString(priceNightBefore));
+				currency_x.setValue(currencyBefore);
+				displayCurrency_l.setText(currencyBefore);
+				totalPrice_x.setText(Long.toString(totalPriceBefore));
+				
+				selectModify(selectedItem, reservationBefore);
+					
+			}
+			
+		}
 		
-		if (selectedItem != null) {
-			
-			setCheckin(selectedItem.getCheckin().get().toLocalDate());
-			setCheckout(selectedItem.getCheckout().get().toLocalDate());
-			
-			int id = selectedItem.getReservationId();			
-			String nameBefore = selectedItem.getName().get();
-			String lastnameBefore = selectedItem.getLastName().get();
-			String phoneNumBefore = Long.toString(selectedItem.getPhoneNum().get());
-			String checkinBefore = selectedItem.getCheckin().get().toLocalDate().toString();
-			String checkoutBefore = selectedItem.getCheckout().get().toLocalDate().toString();
-			String totalPriceBefore = Long.toString(selectedItem.getTotalPrice().get());
-			String currencyBefore = selectedItem.getCurrency().get();
-			String timestampBefore = selectedItem.getCreatedat().get().toString();
-			
-			String reservationBefore = 
-					 "Id: "  + id
-				   + "| Name:  " + nameBefore 
-				   + "| LastName: " + lastnameBefore
-				   + "| Tel: " + phoneNumBefore
-				   + "| Check-in: " + checkinBefore
-				   + "| Check-out: " + checkoutBefore
-				   + "| TotalPrice " + totalPriceBefore
-				   + "| Currency " + currencyBefore
-				   + "| DateOfCreation " + timestampBefore;
-			
-			name_x.setText(nameBefore);
-			lastName_x.setText(lastnameBefore);
-			phonenum_x.setText(phoneNumBefore);
-			checkin_x.setText(checkinBefore);
-			checkout_x.setText(checkoutBefore);
-			totalPrice_x.setText(totalPriceBefore);
-			
+				);
+		
+		
+	}
+	
+	public void selectModify(Reservation r , String reservationBefore) {
+
 			update_b.setOnAction( e -> {
+				int id = r.getReservationId();
 				
 				if(!areEmpty()) {
 					
@@ -306,16 +365,16 @@ public class CalendarController implements Initializable {
 						update.setDate(4, checkinAfter);
 						update.setDate(5, checkoutAfter);
 						update.setLong(6, totalPriceAfter);
-						update.setTimestamp(7, timestampAfter);
-						update.setInt(8, id);
+						update.setString(7, currencyAfter);
+						update.setTimestamp(8, timestampAfter);
+						update.setInt(9, id);
 						update.executeUpdate();
 						
 						PreparedStatement updateLogs = Database.con().prepareStatement
 		    				 ( "INSERT INTO `hoteldatabase`.`log_reservations` "
 		    				 + "(`userName`, `action`, `reservationBefore`, `reservationAfter`, `timestamp`) "
 		    				 + "VALUES ('Eljon', 'Modification', ?, ?, ? );" );
-		    		
-		    			
+
 						updateLogs.setString(1, reservationBefore);
 						updateLogs.setString(2, reservationAfter);
 						updateLogs.setTimestamp(3, timestampAfter);
@@ -326,7 +385,6 @@ public class CalendarController implements Initializable {
 					}
 				 
 		            clickClear();
-		            modify_b.setSelected(false);
 		            update_b.setDisable(true);
 		            create_b.setDisable(false);
 					refresh();
@@ -340,61 +398,65 @@ public class CalendarController implements Initializable {
 					);
 			
 		}
+	
+	public void setDisable(boolean disable) {
 		
+		name_x.setDisable(disable);
+		lastName_x.setDisable(disable);
+		phonenum_x.setDisable(disable);
+	
+		checkin_x.setDisable(disable);
+		checkout_x.setDisable(disable);
+
+		setCheckin_b.setDisable(disable);
+		setCheckout_b.setDisable(disable);
+		
+		price_night_x.setDisable(disable);
+		currency_x.setDisable(disable);
+		totalPrice_x.setDisable(disable);
+	
 	}
+		
+	
 
 	public void someInitalValues() {
 		
-		update_b.setDisable(true);
+		price_night_x.textProperty().addListener( e -> {
+			setTotalPrice(calcPrice(getCheckin(),getCheckout()));
+			totalPrice_x.setText(Long.toString(getTotalPrice()));
+		});
+		
 		currency_x.setItems(currencies);
 		currency_x.setValue(tempCurrency);
 		displayCurrency_l.setText(tempCurrency);
+		
 		currency_x.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			displayCurrency_l.setText(newValue);
 		});
 		
-		modify_b.selectedProperty().addListener
+		edit_b.setOnAction
 		( e -> {
+			Reservation	selectedItem = reservationsTable.getSelectionModel().getSelectedItem();
 			
-			if(modify_b.isSelected()
-					&& reservationsTable.getSelectionModel().getSelectedItem() != null) {
-				selectModify();
+			if(selectedItem != null) {
+				setDisable(false);
 				update_b.setDisable(false);
 				create_b.setDisable(true);
-			}
-			
-			else {
-				clickClear();
-				update_b.setDisable(true);
-				create_b.setDisable(false);
 				
-			}
-			
+				if(selectedItem.getCheckin().get().toLocalDate().compareTo(LocalDate.now()) <0) {
+					setCheckin(LocalDate.parse(checkin_x.getText()));
+					setCheckin_b.setDisable(true);
+					setCheckout_b.setSelected(true);
+				}
+						
+	            busyDates.clear();
+	            populateBusyDates();
+	            populateCalendar(currentYearMonth);
+
+			}			
 		});
 				
-		reservationsTable.setOnMouseClicked( event -> {
-			
-			setCheckin(null);
-			setCheckout(null);
-			temp.clear();
-
-
-			if(reservationsTable.getSelectionModel().getSelectedItem() != null) {
-				
-				Reservation r =	reservationsTable.getSelectionModel().getSelectedItem();
-				LocalDate start = r.getCheckin().get().toLocalDate();
-				LocalDate end = r.getCheckout().get().toLocalDate();
-				List<LocalDate>	l = start.datesUntil(end)
-						.collect(Collectors.toList());
-				
-				temp.addAll(l);
-				populateCalendar(currentYearMonth);
-				
-			}
-			
-		}
 		
-				);
 		
 		toggleGR.selectedToggleProperty()
 		.addListener((obsVal, oldVal, newVal) -> 
@@ -408,10 +470,6 @@ public class CalendarController implements Initializable {
 		setCheckin_b.setSelected(true);
 		room_x.setText("ROOM: " + getSelectedRoom());
 		price_night_x.setText(priceNight+"");
-		
-		
-		
-		
 		
 		setCheckin_b.setOnMouseClicked(checkin -> {
 
@@ -427,7 +485,6 @@ public class CalendarController implements Initializable {
 
 		});
 	}
-	
 	public void clickDeleteReservation() {
 		
 		Reservation selectedItem = 
@@ -475,8 +532,7 @@ public class CalendarController implements Initializable {
 	    			
 		            setCheckin(null);
 		            setCheckout(null);
-		            refresh();
-		            
+		            clickClear();
 	    		} catch (SQLException e1) {
 	    			e1.printStackTrace();
 	    			
@@ -498,8 +554,9 @@ public class CalendarController implements Initializable {
     		daysNo = Duration.between(
     				checkin.atStartOfDay(), 
     				checkout.atStartOfDay()).toDays();
-    		setPriceNight();
-    		price = getPriceNight() * daysNo;
+    		int pn = Integer.parseInt(price_night_x.getText());
+
+    		price = pn * daysNo;
     	}
     	
     	return price;
@@ -599,44 +656,52 @@ public class CalendarController implements Initializable {
 		    					));
 		    	
 				reservationsTable.setItems(reservations);
-				populateBusyDates();
+				
 		    }
   
 		} catch (SQLException e) {
 			e.printStackTrace();
 			
 		}
+		populateBusyDates();
 	}
 	
 	public void populateBusyDates() {
 		
-		if(reservations != null) {
+		try {
 			
-		for(Reservation r : reservations) {
+			PreparedStatement ps = Database.con().prepareStatement
+					("select check_in , check_out\r\n"
+					+ "from hoteldatabase.reservations");
 			
-			ObjectProperty<Date> startDate = r.getCheckin();
-			ObjectProperty<Date> endDate = r.getCheckout();
+			ResultSet resultSet = ps.executeQuery();
 			
-			checkins.add(startDate.get().toLocalDate());
-			
-
-			listOfDates = (
-					 startDate.get().toLocalDate().plusDays(1))
-					.datesUntil(endDate.get().toLocalDate())
-					.collect(Collectors.toList());
-			
-
-			for(LocalDate date : listOfDates) {
+			while(resultSet.next()) {
 				
-				if(!busyDates.contains(date)) {
-					busyDates.add(date);
-					
+				Date checkin  = resultSet.getDate("check_in");
+		    	Date checkout  = resultSet.getDate("check_out");
+		    	
+		    	checkins.add(checkin.toLocalDate());
+		    	
+				listOfDates = (
+						checkin.toLocalDate().plusDays(1))
+						.datesUntil(checkout.toLocalDate())
+						.collect(Collectors.toList());
+				
+				for(LocalDate date : listOfDates) {
+					if(!busyDates.contains(date)) {
+						busyDates.add(date);
+						}
+					}
 				}
-				
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-			   busyDates.addAll(checkins);
-		}}
+		
+		   busyDates.addAll(checkins);
+		
 	}
+	
 	
 	
     public void CalendarView(YearMonth yearMonth) 
@@ -687,21 +752,14 @@ public class CalendarController implements Initializable {
         		String.valueOf(yearMonth.getYear()));
     }
     
-public void selectionHandler(DayNode dateCell) {
+    public void selectionHandler(DayNode dateCell) {
     	
     	busyDates.add(getCheckin());
     	busyDates.add(getCheckout());
     	
     	LocalDate future = null;
     	
-    	if(checkins != null && getCheckin() != null) {
-		FXCollections.sort(checkins);
-  		for(LocalDate date : checkins) {
-			if(date.isAfter(getCheckin())) {
-				future = date;
-				break;
-			}}
-		}
+
     	
     	if(dateCell.getDate().compareTo(LocalDate.now()) < 0) {
     		dateCell.setDisable(true);
@@ -711,23 +769,12 @@ public void selectionHandler(DayNode dateCell) {
     			&& dateCell.getDate().compareTo(getCheckin()) <= 0) {
     		dateCell.setDisable(true);
     	}
-    	
-   		if(future != null) 
-   		{
-   			busyDates.remove(future);
-   		}
-    	
-		if(future != null && getCheckin() != null 
-				&& dateCell.getDate().isAfter(future)) {
-			
-			dateCell.setDisable(true);
-		}
-		
+    			
 		if(getCheckout() != null 
     			&& getCheckin().compareTo(dateCell.getDate()) 
-    			* dateCell.getDate().compareTo(getCheckout()) >= 0) {
-    		    
-    		dateCell.setStyle("-fx-background-color:yellow");
+    			* dateCell.getDate().compareTo(getCheckout()) >=0) {
+			
+			dateCell.setStyle("-fx-background-color:yellow");
     	
     	} 
     	
@@ -735,12 +782,8 @@ public void selectionHandler(DayNode dateCell) {
    	
     	{  
     		dateCell.setStyle(null);
-    		if(temp.contains(dateCell.getDate()) && modify_b.isSelected()) {
-        		
-        		dateCell.setStyle("-fx-background-color: green");
-        		
+    		
     	}
-    		}
 		
 
 		
@@ -769,6 +812,26 @@ public void selectionHandler(DayNode dateCell) {
     			
     		}
 		}
+    	
+		if(checkins != null && getCheckin() != null) {
+		FXCollections.sort(checkins);
+  		for(LocalDate date : checkins) {
+			if(date.isAfter(getCheckin())) {
+				future = date;
+				break;
+			}}
+		}
+    	
+   		if(future != null) 
+   		{
+   			busyDates.remove(future);
+   		}
+		
+   		if(future != null && getCheckin() != null 
+				&& dateCell.getDate().isAfter(future)) {
+			
+			dateCell.setDisable(true);
+		}
 
     }
         
@@ -778,7 +841,7 @@ public void selectionHandler(DayNode dateCell) {
     			
     			e -> {
     				
-					if(modify_b.isSelected()) {
+					if(!update_b.isDisabled()) {
 						busyDates.removeAll(temp);
 					}
     				
@@ -789,28 +852,26 @@ public void selectionHandler(DayNode dateCell) {
     					if(setCheckin_b.isSelected())
     					
     					{
-    						
     						setCheckin(selected.getDate());
     						checkin_x.setText(getCheckin().toString());
-    						populateCalendar(currentYearMonth);
     						setCheckout_b.setSelected(true);
-    				} 
-    			
-    				else if(setCheckout_b.isSelected() && getCheckin() != null)
-    			   	
-    				{
+    					}
+    					
+    					else if(setCheckout_b.isSelected() && getCheckin() != null)
+    					
+    					{
     					setCheckout(selected.getDate());
         				checkout_x.setText(getCheckout().toString());
-        				refresh();
-        				if(modify_b.isSelected()) {
-        					busyDates.removeAll(temp);
-        				}
         				
-    				} else if(setCheckout_b.isSelected() && getCheckin() == null) {
+    					} else if(setCheckout_b.isSelected() && getCheckin() == null) {
     					
     					checkout_x.setText("^^^^^^");
-        			}
     					
+    					}
+    					busyDates.clear();
+    					checkins.clear();
+    					populateBusyDates();
+    					populateCalendar(currentYearMonth);
     					setTotalPrice(calcPrice(getCheckin(),getCheckout()));
     					totalPrice_x.setText(Long.toString(getTotalPrice()));
     					
@@ -845,12 +906,10 @@ public void selectionHandler(DayNode dateCell) {
 
    	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		price_night_x.textProperty().addListener( e -> {
-			setTotalPrice(calcPrice(getCheckin(),getCheckout()));
-			totalPrice_x.setText(Long.toString(getTotalPrice()));
-		});
+		clickReservation();
 		tableSetup();
 		someInitalValues();
 		CalendarView(YearMonth.now());
+		
 	}
 }
