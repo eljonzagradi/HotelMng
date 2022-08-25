@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -27,6 +28,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -68,6 +70,7 @@ public class RoomsController implements Initializable {
 	@FXML private Button submit_b;
 	@FXML private Button clear_b;
 	@FXML private Button clearImg_b;
+	@FXML private Button delete_b;
 	
 	@FXML private ToggleButton viewAllRooms_b;
 	@FXML private ToggleButton viewAvailableRooms_b;
@@ -140,6 +143,43 @@ public class RoomsController implements Initializable {
 			ex.printStackTrace();
 			
 		}
+		
+	}
+	
+	public void clickDeleteRoom(int id) {
+		
+		delete_b.setOnAction( e -> {
+			
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+	    	alert.setTitle("Confirmation Dialog");
+	    	alert.setHeaderText(null);
+	    	alert.setContentText("Do you want to delete this room ? "
+	    			+ "\n All the reservations in this room wii be also deleted.");
+
+	    	Optional<ButtonType> result = alert.showAndWait();
+	    	
+	    	if (result.get() == ButtonType.OK) {
+	    		
+	    		try {
+					PreparedStatement ps1 = Database.con().prepareStatement
+							("DELETE FROM `hoteldatabase`.`reservations`\r\n"
+									+ "WHERE number = ? ;");
+					ps1.setInt(1, id);
+					ps1.execute();
+					
+					PreparedStatement ps2 = Database.con().prepareStatement
+							("DELETE FROM `hoteldatabase`.`rooms`"
+									+ "WHERE number = ? ;");
+					ps2.setInt(1, id);
+					ps2.execute();
+					
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}	    		
+	    		clickClear();
+	    	}
+
+		});
 		
 	}
 	
@@ -291,7 +331,8 @@ public class RoomsController implements Initializable {
 
 		setDisable(true);
 		setActiveSelection(room);
-		loadSelectedRoom(getActiveSelection());	
+		loadSelectedRoom(getActiveSelection());
+		clickDeleteRoom(getActiveSelection().getNumber());
 		
 
 		for(Room r : allRoomsList) {
@@ -311,8 +352,6 @@ public class RoomsController implements Initializable {
 								new Insets(0))));
 			     
 			}
-			
-
 
 		}
 		
@@ -363,7 +402,6 @@ public class RoomsController implements Initializable {
 		price_night_x.clear();
 		footer_l.setText(null);
 		photo_x.setImage(null);
-		setActiveSelection(null);
 		isBusy_l.setText(null);
 		submit_b.setDisable(true);
 		clear_b.setDisable(true);

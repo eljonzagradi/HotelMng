@@ -845,7 +845,8 @@ public class CalendarController implements Initializable {
 						busyDates.removeAll(temp);
 					}
     				
-    				if(!busyDates.contains(selected.getDate()) && selected.getText() != null) 
+    				if(!busyDates.contains(selected.getDate()) && selected.getText() != null 
+    						&& !(update_b.isDisabled() && create_b.isDisabled())) 
     				
     				{
     					
