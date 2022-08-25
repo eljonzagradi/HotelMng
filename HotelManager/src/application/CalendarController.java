@@ -5,7 +5,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -619,16 +618,18 @@ public class CalendarController implements Initializable {
 		
 	public void loadDataFromDB() {
 				
-		Statement statement;
 		ResultSet resultSet;
 		
 		try {
-			statement = Database.con().createStatement();
-			
-			resultSet = statement.executeQuery("select *\r\n"
+			PreparedStatement load = Database.con().prepareStatement
+					("select *\r\n"
 					           + "from hoteldatabase.reservations r\r\n"
-					           + "where number = '"+getSelectedRoom()+"'\r\n"
+					           + "where number = ? \r\n"
 					           );
+			load.setInt(1, getSelectedRoom());
+			
+			resultSet = load.executeQuery();
+			
 			while (resultSet.next()) {
 		    	
 				int resevation_id = resultSet.getInt("id_reservation");
@@ -672,7 +673,9 @@ public class CalendarController implements Initializable {
 			
 			PreparedStatement ps = Database.con().prepareStatement
 					("select check_in , check_out\r\n"
-					+ "from hoteldatabase.reservations");
+					+ "from hoteldatabase.reservations\r\n"
+					+ "where number = ?;");
+			ps.setInt(1, getSelectedRoom());
 			
 			ResultSet resultSet = ps.executeQuery();
 			
@@ -758,8 +761,6 @@ public class CalendarController implements Initializable {
     	busyDates.add(getCheckout());
     	
     	LocalDate future = null;
-    	
-
     	
     	if(dateCell.getDate().compareTo(LocalDate.now()) < 0) {
     		dateCell.setDisable(true);
