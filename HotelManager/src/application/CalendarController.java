@@ -236,7 +236,9 @@ public class CalendarController implements Initializable {
 			setCheckout(null);
 			LocalDate todayDate = LocalDate.now();
 			temp.clear();
-			edit_b.setDisable(false);				
+			edit_b.setDisable(false);
+			deleteReservation.setDisable(false);
+
 
 
 
@@ -247,6 +249,7 @@ public class CalendarController implements Initializable {
 				if(selectedItem.getCheckin().get().toLocalDate().isBefore(todayDate)
 						&& todayDate.isAfter(selectedItem.getCheckout().get().toLocalDate())) {
 					
+					deleteReservation.setDisable(true);
 					edit_b.setDisable(true);				
 
 		    		} 
@@ -265,7 +268,6 @@ public class CalendarController implements Initializable {
 					
 				}
 				
-				deleteReservation.setDisable(false);
 				create_b.setDisable(true);
 				update_b.setDisable(true);
 				setDisable(true);
@@ -292,6 +294,7 @@ public class CalendarController implements Initializable {
 				long    daysNo = Duration.between(
 						checkinBefore.atStartOfDay(), 
 						checkoutBefore.atStartOfDay()).toDays();
+				
 				long priceNightBefore = totalPriceBefore/daysNo;
 				
 				
