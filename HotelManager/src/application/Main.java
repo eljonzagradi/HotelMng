@@ -15,6 +15,11 @@ public class Main extends Application {
             Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
+//	        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+//	        primaryStage.setX(primaryScreenBounds.getMinX());
+//	        primaryStage.setY(primaryScreenBounds.getMinY());
+//	        primaryStage.setWidth(primaryScreenBounds.getWidth());
+//	        primaryStage.setHeight(primaryScreenBounds.getHeight());
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();

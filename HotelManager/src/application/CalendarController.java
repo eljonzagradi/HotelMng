@@ -234,11 +234,23 @@ public class CalendarController implements Initializable {
 			int m2 = 0;
 			setCheckin(null);
 			setCheckout(null);
+			LocalDate todayDate = LocalDate.now();
 			temp.clear();
+			edit_b.setDisable(false);				
+
+
 
 			Reservation	selectedItem = reservationsTable.getSelectionModel().getSelectedItem();
 			activeReservation = selectedItem;
 			if(selectedItem != null) {
+				
+				if(selectedItem.getCheckin().get().toLocalDate().isBefore(todayDate)
+						&& todayDate.isAfter(selectedItem.getCheckout().get().toLocalDate())) {
+					
+					edit_b.setDisable(true);				
+
+		    		} 
+		    		
 				int m1 = currentYearMonth.getMonthValue();
 				m2 = selectedItem.getCheckin().get().toLocalDate().getMonthValue();
 				
@@ -257,7 +269,6 @@ public class CalendarController implements Initializable {
 				create_b.setDisable(true);
 				update_b.setDisable(true);
 				setDisable(true);
-				edit_b.setDisable(false);				
 				LocalDate start = selectedItem.getCheckin().get().toLocalDate();
 				LocalDate end = selectedItem.getCheckout().get().toLocalDate();
 				List<LocalDate>	l = start.datesUntil(end)

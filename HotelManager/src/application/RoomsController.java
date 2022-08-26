@@ -19,6 +19,7 @@ import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -38,6 +39,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -126,17 +129,23 @@ public class RoomsController implements Initializable {
 		CalendarController.priceNight = Integer.parseInt(price_night_x.getText());
 		CalendarController.tempCurrency = currency_x.getValue();
 		
-		Stage stage =  (Stage) open_b.getScene().getWindow();
-		stage.close();
+		Stage primaryStage =  (Stage) open_b.getScene().getWindow();
+		primaryStage.close();
 		
-		Stage primaryStage = new Stage();
+		Stage stage = new Stage();
 		
 		try {
 			Parent root = FXMLLoader.load(getClass().getResource("/application/Calendar.fxml"));
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setScene(scene);
-			primaryStage.show();
+	        stage.setScene(scene);
+//	        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+//	        stage.setX(primaryScreenBounds.getMinX());
+//	        stage.setY(primaryScreenBounds.getMinY());
+//	        stage.setWidth(primaryScreenBounds.getWidth());
+//	        stage.setHeight(primaryScreenBounds.getHeight());
+			stage.setScene(scene);
+			stage.show();
 			
 		} 
 		
@@ -227,7 +236,7 @@ public class RoomsController implements Initializable {
 			+ "(SELECT number FROM  hoteldatabase.rooms ro\r\n"
 			+ "LEFT JOIN hoteldatabase.reservations r\r\n"
 			+ "USING (number) WHERE NOT check_in > ? AND check_out > ?)\r\n"
-			+ "ORDER BY ro.number,check_in");
+			+ "ORDER BY ro.number");
 			availableRooms.setDate(1,java.sql.Date.valueOf(todayDate));
 			availableRooms.setDate(2,java.sql.Date.valueOf(todayDate));
 			
@@ -236,7 +245,7 @@ public class RoomsController implements Initializable {
 			+ "FROM `hoteldatabase`.rooms ro\r\n"
 		    + "LEFT JOIN `hoteldatabase`.reservations r \r\n"
 			+ "ON ro.number = r.number \r\n"
-			+ "ORDER BY ro.number,check_in");
+			+ "ORDER BY ro.number");
 			
 			if( viewAllRooms_b.isSelected()) {
 				resultSet = allRooms.executeQuery();
@@ -323,8 +332,21 @@ public class RoomsController implements Initializable {
 	
 	
 	public void selectRoom(Room room) {
-		room.setOnMouseClicked( e -> { 
-			clickRoom(room);
+		
+		room.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent mouseEvent) {
+		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+		            if(mouseEvent.getClickCount() == 2){
+		    			clickRoom(room);
+		    			clickOpen();
+		                System.out.println("Double clicked");
+		            } else if (mouseEvent.getClickCount() == 1) {
+		    			clickRoom(room);
+
+		            }
+		        }
+		    }
 		});
 	}
 	
@@ -399,7 +421,7 @@ public class RoomsController implements Initializable {
 		loadRooms();
 
 	}
-	
+			
 	public void clickClear() {
 		setDisable(true);
 		

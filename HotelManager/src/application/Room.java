@@ -47,9 +47,11 @@ public class Room  extends Label {
 				new BackgroundFill(Color.AQUA,
 						new CornerRadii(0),
 						new Insets(0))));
-        this.setFont(new Font("Arial", 20));
+        this.setFont(new Font("Arial", 15));
 		this.setStyle("-fx-border-color: white;");
-		this.setText(  "ROOM:" +number+"\n");
+		this.setText
+		( "ROOM:" +number+"\n"
+		+ "Category: " + category);
 	}
 
 	public int getRoom_id() {
