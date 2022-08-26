@@ -778,9 +778,7 @@ public class CalendarController implements Initializable {
 			dateCell.setStyle("-fx-background-color:yellow");
     	
     	} 
-    	
     	else 
-   	
     	{  
     		dateCell.setStyle(null);
     		
