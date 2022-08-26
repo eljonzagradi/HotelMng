@@ -211,11 +211,11 @@ public class RoomsController implements Initializable {
 	}
 	
 	public void loadRooms() {
-
 		int rowInx = 0;
 		int columnInx = 0;
 		ResultSet resultSet = null;
 		Room room = null;
+		
 		
 		try {
 			PreparedStatement availableRooms = Database.con().prepareStatement
@@ -276,35 +276,49 @@ public class RoomsController implements Initializable {
 		    	
 			    if(!roomList.contains(roomNo)) {
 			    	selectRoom(room);
-				    roomLayout.add(room, columnInx, rowInx);
 			    	roomList.add(roomNo);
 			    	allRoomsList.add(room);
 			    	
-			    	++columnInx;
+			    	if(rowInx == 0 && columnInx == 0 ) {
+			    		roomLayout.getRowConstraints().add(new RowConstraints(80));
+			    		System.out.println(rowInx);
+
+			    	}
 			    	
-			    	if(columnInx > 3){
+			    	if (columnInx == roomLayout.getColumnCount()) {
 			    		columnInx = 0;
 			    		++rowInx;
-			    		roomLayout.getRowConstraints()
-			    		.add(new RowConstraints(80));
-				    		}
+			    		RowConstraints row = new RowConstraints(80);
+			    		row.setFillHeight(true);
+			    		roomLayout.getRowConstraints().add(row);
+			    		
+			    		System.out.println(rowInx);
+			    	}
+			     	roomLayout.add(room, columnInx, rowInx);
+
+			    	columnInx++;
+					
+
 				    
-				    }
+			    }
 			    
 			}
+		
 			
-			for(Room r : allRoomsList) {
-							
-				if(busyR.contains(r.getNumber())) {
-					r.setBusy(true);
-					roomBusy(r);
-				}}
+
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
 			
 		}
 		
+		for(Room r : allRoomsList) {						
+			if(busyR.contains(r.getNumber())) {
+
+				r.setBusy(true);
+				roomBusy(r);
+			}
+		}
 	}
 	
 	
@@ -378,7 +392,8 @@ public class RoomsController implements Initializable {
 	
 	public  void refresh() {
 		
-		roomLayout.getChildren().clear();;
+		roomLayout.getChildren().clear();
+		roomLayout.getRowConstraints().clear();
 		allRoomsList.clear();
 		roomList.clear();
 		loadRooms();
