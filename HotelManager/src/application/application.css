@@ -40,3 +40,25 @@
 .radio-button:disabled, .radio-button:disabled > * {
   -fx-opacity: 0.8 ;
 }
+
+#clean .text{
+	-fx-background-color: green;
+    -fx-fill : black;
+}
+
+#dirty .text{
+	
+	-fx-background-color: red;
+    -fx-fill : black;
+    
+}
+
+#outOfService .text{
+	-fx-background-color: yellow;
+    -fx-fill : black;
+}
+
+#table{
+    -fx-border-color: -fx-box-border;
+    -fx-border-insets: -1 -1 0 0;
+}

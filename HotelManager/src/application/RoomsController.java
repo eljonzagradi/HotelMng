@@ -84,6 +84,7 @@ public class RoomsController implements Initializable {
 	@FXML private GridPane roomLayout;
 	@FXML private Button imageSelector_b;
 	@FXML private Label isBusy_l;
+	
 	List<Integer> roomList = new ArrayList<Integer>();
 	List<Integer> busyR = new ArrayList<Integer>();
 	ObservableList<String> categories = FXCollections.observableArrayList();
@@ -278,7 +279,7 @@ public class RoomsController implements Initializable {
 		    	if(checkin !=null || checkout !=null ) {
 		    		
 		    		if(checkin.toLocalDate().compareTo(todayDate)
-		    				* todayDate.compareTo(checkout.toLocalDate()) >= 0) {
+		    				* todayDate.compareTo(checkout.toLocalDate()) > 0) {
 		    			busyR.add(roomNo);
 		    			}
 		    		}
@@ -290,7 +291,6 @@ public class RoomsController implements Initializable {
 			    	
 			    	if(rowInx == 0 && columnInx == 0 ) {
 			    		roomLayout.getRowConstraints().add(new RowConstraints(80));
-			    		System.out.println(rowInx);
 
 			    	}
 			    	
@@ -301,7 +301,6 @@ public class RoomsController implements Initializable {
 			    		row.setFillHeight(true);
 			    		roomLayout.getRowConstraints().add(row);
 			    		
-			    		System.out.println(rowInx);
 			    	}
 			     	roomLayout.add(room, columnInx, rowInx);
 
@@ -322,7 +321,7 @@ public class RoomsController implements Initializable {
 		}
 		
 		for(Room r : allRoomsList) {						
-			if(busyR.contains(r.getNumber())) {
+			if(busyR.contains(r.getNumber().get())) {
 
 				r.setBusy(true);
 				roomBusy(r);
@@ -340,7 +339,6 @@ public class RoomsController implements Initializable {
 		            if(mouseEvent.getClickCount() == 2){
 		    			clickRoom(room);
 		    			clickOpen();
-		                System.out.println("Double clicked");
 		            } else if (mouseEvent.getClickCount() == 1) {
 		    			clickRoom(room);
 
@@ -366,7 +364,7 @@ public class RoomsController implements Initializable {
 		setActiveSelection(room);
 		delete_b.setDisable(false);
 		loadSelectedRoom(getActiveSelection());
-		clickDeleteRoom(getActiveSelection().getNumber());
+		clickDeleteRoom(getActiveSelection().getNumber().get());
 		
 		for(Room r : allRoomsList) {
 			
@@ -589,7 +587,7 @@ public class RoomsController implements Initializable {
 	
      public void loadSelectedRoom(Room r) {
     	 photo_x.setImage(null);
-    	 int room_number = r.getNumber();
+    	 int room_number = r.getNumber().get();
     	 
     	 try {
 			 

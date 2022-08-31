@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="544.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.HousekeepingController">
+   <children>
+      <TableView fx:id="table" layoutX="14.0" layoutY="14.0" onSort="#selectRoom" prefHeight="377.0" prefWidth="368.0">
+        <columns>
+          <TableColumn fx:id="roomNo_c" prefWidth="112.0" text="Room" />
+          <TableColumn fx:id="roomType_c" prefWidth="107.0" text="Room Type" />
+            <TableColumn fx:id="roomStatus_c" prefWidth="145.0" text="Status" />
+        </columns>
+      </TableView>
+      <Button fx:id="apply_b" disable="true" layoutX="405.0" layoutY="71.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Apply" />
+      <ChoiceBox fx:id="roomStatus_x" disable="true" layoutX="403.0" layoutY="32.0" prefHeight="31.0" prefWidth="126.0" />
+      <Button layoutX="403.0" layoutY="366.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="126.0" text="Go Back" />
+      <Button fx:id="clear_b" disable="true" layoutX="469.0" layoutY="71.0" mnemonicParsing="false" onAction="#clearSelection" prefHeight="25.0" prefWidth="60.0" text="Clear" />
+   </children>
+</AnchorPane>

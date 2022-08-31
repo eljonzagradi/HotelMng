@@ -670,7 +670,6 @@ public class CalendarController implements Initializable {
 		    					timestamp
 		    					));
 		    	
-				reservationsTable.setItems(reservations);
 				
 		    }
   
@@ -678,6 +677,7 @@ public class CalendarController implements Initializable {
 			e.printStackTrace();
 			
 		}
+		reservationsTable.setItems(reservations);
 		populateBusyDates();
 	}
 	

@@ -2,6 +2,7 @@ package application;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -16,6 +17,7 @@ public class Room  extends Label {
 	private int room_id;
 	private SimpleIntegerProperty number;
 	private SimpleStringProperty category;
+	private SimpleStringProperty status;
 	private SimpleIntegerProperty capacity;
 	private SimpleStringProperty ac;
 	private SimpleStringProperty view;
@@ -53,17 +55,23 @@ public class Room  extends Label {
 		( "ROOM:" +number+"\n"
 		+ "Category: " + category);
 	}
+	
+	Room(int number,String category,String status) {
+		this.number = new SimpleIntegerProperty(number);
+		this.category = new SimpleStringProperty(category);
+		this.status = new SimpleStringProperty(status);
+	}
 
 	public int getRoom_id() {
 		return room_id;
 	}
 
-	public int getNumber() {
-		return number.get();
+	public SimpleIntegerProperty getNumber() {
+		return number;
 	}
 
-	public String getCategory() {
-		return category.get();
+	public StringProperty getCategory() {
+		return category;
 	}
 
 	public int getCapacity() {
@@ -100,5 +108,12 @@ public class Room  extends Label {
 
 	public void setBusy(boolean busy) {
 		this.busy = busy;
+	}
+
+	public StringProperty getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = new SimpleStringProperty(status);
 	}
 }
