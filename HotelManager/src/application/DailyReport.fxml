@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DailyReportController">
    <children>
       <Label alignment="CENTER" layoutX="154.0" layoutY="14.0" prefHeight="37.0" prefWidth="193.0" text="Daily Report">
          <font>
@@ -18,6 +18,30 @@
             <Font name="System Bold Italic" size="15.0" />
          </font>
       </Label>
-      <Label fx:id="date_x" alignment="CENTER" layoutX="56.0" layoutY="51.0" prefHeight="21.0" prefWidth="135.0" />
+      <Label layoutX="14.0" layoutY="84.0" prefHeight="21.0" prefWidth="98.0" text="Total Rooms:">
+         <font>
+            <Font name="System Bold Italic" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="14.0" layoutY="118.0" prefHeight="21.0" prefWidth="117.0" text="Booked Rooms:">
+         <font>
+            <Font name="System Bold Italic" size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="date_x" alignment="CENTER" layoutX="131.0" layoutY="48.0" prefHeight="21.0" prefWidth="135.0" text="yyyy-mm-dd">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+      <Label fx:id="totalRooms_l" alignment="CENTER" layoutX="131.0" layoutY="81.0" prefHeight="21.0" prefWidth="135.0" text="n">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="goback_b" layoutX="426.0" layoutY="461.0" mnemonicParsing="false" onAction="#goBack" text="Go Back" />
+      <Label fx:id="bookedRooms_l" alignment="CENTER" layoutX="131.0" layoutY="115.0" prefHeight="21.0" prefWidth="135.0" text="n">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

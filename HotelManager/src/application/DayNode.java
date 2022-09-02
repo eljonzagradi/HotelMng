@@ -20,19 +20,19 @@ public class DayNode  extends Label{
 
     }
     
+    public boolean getBusy() {
+		return busy;
+	}
+
     public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-	public boolean getBusy() {
-		return busy;
-	}
-
 	public void setBusy(boolean busy) {
 		this.busy = busy;
 	}
+
+	public void setDate(LocalDate date) {
+        this.date = date;
+    }
 }

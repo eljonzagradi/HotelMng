@@ -48,14 +48,6 @@ public class Reservation {
         this.createdat = new SimpleObjectProperty<Timestamp>(createdat);
 	}
 
-	public StringProperty getName() {
-		return name;
-	}
-
-	public StringProperty getLastName() {
-		return lastName;
-	}
-
 	public ObjectProperty<Date> getCheckin() {
 		return checkin;
 	}
@@ -64,27 +56,35 @@ public class Reservation {
 		return checkout;
 	}
 
-	public LongProperty getTotalPrice() {
-		return totalPrice;
-	}
-
 	public ObjectProperty<Timestamp> getCreatedat() {
 		return createdat;
 	}
 
-	public SimpleIntegerProperty getRoomNum() {
-		return roomNum;
+	public StringProperty getCurrency() {
+		return currency;
+	}
+
+	public StringProperty getLastName() {
+		return lastName;
+	}
+
+	public StringProperty getName() {
+		return name;
+	}
+
+	public LongProperty getPhoneNum() {
+		return phoneNum;
 	}
 	
 	public int getReservationId() {
 		return reservation_id.get();
 	}
 
-	public LongProperty getPhoneNum() {
-		return phoneNum;
+	public SimpleIntegerProperty getRoomNum() {
+		return roomNum;
 	}
 
-	public StringProperty getCurrency() {
-		return currency;
+	public LongProperty getTotalPrice() {
+		return totalPrice;
 	}
 }

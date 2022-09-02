@@ -16,11 +16,7 @@ public class Database {
 			String password = "root";
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			con = DriverManager.getConnection(url, username, password);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
 		return con;	

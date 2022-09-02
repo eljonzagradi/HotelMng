@@ -81,9 +81,11 @@ public class RoomsController implements Initializable {
 	@FXML private Button addRoom_b;
 	@FXML private Button edit_b;
 	@FXML private Button open_b;
+	@FXML private Button houseK_b;
 	@FXML private GridPane roomLayout;
 	@FXML private Button imageSelector_b;
 	@FXML private Label isBusy_l;
+	@FXML private Label status_l;
 	
 	List<Integer> roomList = new ArrayList<Integer>();
 	List<Integer> busyR = new ArrayList<Integer>();
@@ -95,27 +97,47 @@ public class RoomsController implements Initializable {
 	private Room activeSelection = null;
 	File file = null;
 	
-	public Room getActiveSelection() {
-		return activeSelection;
-	}
+	public void addCategoty(ComboBox<String> cb ) {
+ 		
+ 		String category = cb.getEditor().getText();
+ 		
+ 		if(!categories.contains(category)) {
+ 			
+ 			try {
+ 				
+ 				PreparedStatement newCategory = Database.con().prepareStatement
+ 						("INSERT INTO `hoteldatabase`.`roomcategories` (`name`) VALUES ( ? );");
+ 				newCategory.setString(1, category);				     
+ 				newCategory.execute();
+ 				} 
+ 			
+ 			catch (SQLException e) {
+ 					e.printStackTrace();
+
+ 			}
+ 			
+ 		}
+ 		
+ 	}
 	
-	public void setActiveSelection(Room active) {
-		this.activeSelection = active;
-		
-	}
-	
-	public void generalInitalValues() {
-		loadCategories();
-		view_x.setItems(views);
-		currency_x.setItems(currencies);
-	}
-	
-	public void clickEdit() {
-		setDisable(false);
-		open_b.setDisable(true);
-		roomNo_x.setDisable(true);
-		submit_b.setDisable(false);
-	}
+	public boolean areEmpty() {
+ 		if(roomNo_x.getText().trim().isEmpty()
+ 				|| category_x.getValue().trim().isEmpty()
+ 				|| capacity_x.getText().trim().isEmpty()
+ 				|| view_x.getValue() == null
+ 				|| price_night_x.getText().trim().isEmpty()
+ 				|| currency_x.getValue() == null
+ 				|| ac.getSelectedToggle() == null
+ 				|| smoking.getSelectedToggle() == null)
+ 		{
+ 			return true;
+ 		} 
+ 		
+ 		else {
+ 			return false;
+ 		}
+ 		
+ 	}
 	
 	public void clickAdd() {
 		clickClear();
@@ -124,37 +146,37 @@ public class RoomsController implements Initializable {
 		clear_b.setDisable(false);
 	}
 	
-	public void clickOpen() {
+	public void clickClear() {
+		setDisable(true);
 		
-		CalendarController.selectedRoom = Integer.parseInt(roomNo_x.getText());
-		CalendarController.priceNight = Integer.parseInt(price_night_x.getText());
-		CalendarController.tempCurrency = currency_x.getValue();
+		roomNo_x.clear();
+		category_x.setValue("");
+		capacity_x.clear();;
+		ac_yes.setSelected(false);
+		ac_no.setSelected(false);
+		view_x.setValue(null);
+		smoking_yes.setSelected(false);
+		smoking_no.setSelected(false);
+		price_night_x.clear();
+		footer_l.setText(null);
+		photo_x.setImage(null);
+		isBusy_l.setText(null);
+	    status_l.setText(null);
+
 		
-		Stage primaryStage =  (Stage) open_b.getScene().getWindow();
-		primaryStage.close();
+		submit_b.setDisable(true);
+		clear_b.setDisable(true);
+		open_b.setDisable(true);
+		edit_b.setDisable(true);
+		delete_b.setDisable(true);
 		
-		Stage stage = new Stage();
-		
-		try {
-			Parent root = FXMLLoader.load(getClass().getResource("/application/Calendar.fxml"));
-			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-	        stage.setScene(scene);
-//	        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-//	        stage.setX(primaryScreenBounds.getMinX());
-//	        stage.setY(primaryScreenBounds.getMinY());
-//	        stage.setWidth(primaryScreenBounds.getWidth());
-//	        stage.setHeight(primaryScreenBounds.getHeight());
-			stage.setScene(scene);
-			stage.show();
-			
-		} 
-		
-		catch(Exception ex) {
-			ex.printStackTrace();
-			
-		}
-		
+		refresh();
+
+	}
+	
+	public void clickClearImg() {
+		file = null;
+		photo_x.setImage(null);
 	}
 	
 	public void clickDeleteRoom(int id) {
@@ -194,168 +216,41 @@ public class RoomsController implements Initializable {
 		
 	}
 	
-	
-	
-	public void clickSelectImage() {
-		
-		FileChooser chooser = new FileChooser();
-	    chooser.setTitle("Select Image File");
-
-	    chooser.getExtensionFilters().addAll(
-	        new FileChooser.ExtensionFilter("Image Files",
-	            "*.png", "*.jpg", "*.jpeg"));
-
-	    file = chooser.showOpenDialog(null);
-		URL url;
-		
-		if(file != null){
-			
-			try {
-				url = file.toURI().toURL();
-				photo_x.setImage(new Image(url.toExternalForm()));
-				
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
-		}
+	public void clickEdit() {
+		setDisable(false);
+		open_b.setDisable(true);
+		roomNo_x.setDisable(true);
+		submit_b.setDisable(false);
 	}
 	
-	public void loadRooms() {
-		int rowInx = 0;
-		int columnInx = 0;
-		ResultSet resultSet = null;
-		Room room = null;
+	
+	
+	public void clickOpen() {
 		
+		CalendarController.selectedRoom = Integer.parseInt(roomNo_x.getText());
+		CalendarController.priceNight = Integer.parseInt(price_night_x.getText());
+		CalendarController.tempCurrency = currency_x.getValue();
+		
+		Stage primaryStage =  (Stage) open_b.getScene().getWindow();
+		primaryStage.close();
+		
+		Stage stage = new Stage();
 		
 		try {
-			PreparedStatement availableRooms = Database.con().prepareStatement
-			("SELECT *\r\n"
-			+ "FROM  hoteldatabase.rooms ro\r\n"
-			+ "LEFT JOIN hoteldatabase.reservations r\r\n"
-			+ "USING (number)\r\n"
-			+ "WHERE  ro.number NOT IN\r\n"
-			+ "(SELECT number FROM  hoteldatabase.rooms ro\r\n"
-			+ "LEFT JOIN hoteldatabase.reservations r\r\n"
-			+ "USING (number) WHERE NOT check_in > ? AND check_out > ?)\r\n"
-			+ "ORDER BY ro.number");
-			availableRooms.setDate(1,java.sql.Date.valueOf(todayDate));
-			availableRooms.setDate(2,java.sql.Date.valueOf(todayDate));
+			Parent root = FXMLLoader.load(getClass().getResource("/application/Calendar.fxml"));
+			Scene scene = new Scene(root);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+	        stage.setScene(scene);
+			stage.setScene(scene);
+			stage.show();
 			
-			PreparedStatement allRooms = Database.con().prepareStatement
-			( "SELECT *"
-			+ "FROM `hoteldatabase`.rooms ro\r\n"
-		    + "LEFT JOIN `hoteldatabase`.reservations r \r\n"
-			+ "ON ro.number = r.number \r\n"
-			+ "ORDER BY ro.number");
-			
-			if( viewAllRooms_b.isSelected()) {
-				resultSet = allRooms.executeQuery();
-			} 
-			else if( viewAvailableRooms_b.isSelected()) {
-					 resultSet = availableRooms.executeQuery();
-			}
-
-			while(resultSet.next()) {
-				
-				Date checkin = resultSet.getDate("check_in");
-			    Date checkout = resultSet.getDate("check_out");
-			    
-				int roomID = resultSet.getInt("id_room");
-				int roomNo = resultSet.getInt("number");
-				String category = resultSet.getString("category");
-			    int capacity = resultSet.getInt("capacity");
-			    String acValue = resultSet.getString("air_c");
-			    String view = resultSet.getString("view");
-			    String smokingValue = resultSet.getString("smoking");
-			    int price =  resultSet.getInt("price_night");
-			    String currency = resultSet.getString("currency");
-			    
-			    room = new Room (
-			    		roomID, roomNo, category,
-			    		capacity, acValue, view,
-			    		smokingValue, price, currency,
-			    		null);
-			    
-		    	if(checkin !=null || checkout !=null ) {
-		    		
-		    		if(checkin.toLocalDate().compareTo(todayDate)
-		    				* todayDate.compareTo(checkout.toLocalDate()) > 0) {
-		    			busyR.add(roomNo);
-		    			}
-		    		}
-		    	
-			    if(!roomList.contains(roomNo)) {
-			    	selectRoom(room);
-			    	roomList.add(roomNo);
-			    	allRoomsList.add(room);
-			    	
-			    	if(rowInx == 0 && columnInx == 0 ) {
-			    		roomLayout.getRowConstraints().add(new RowConstraints(80));
-
-			    	}
-			    	
-			    	if (columnInx == roomLayout.getColumnCount()) {
-			    		columnInx = 0;
-			    		++rowInx;
-			    		RowConstraints row = new RowConstraints(80);
-			    		row.setFillHeight(true);
-			    		roomLayout.getRowConstraints().add(row);
-			    		
-			    	}
-			     	roomLayout.add(room, columnInx, rowInx);
-
-			    	columnInx++;
-					
-
-				    
-			    }
-			    
-			}
+		} 
 		
-			
-
-		} catch (SQLException e) {
-			
-			e.printStackTrace();
+		catch(Exception ex) {
+			ex.printStackTrace();
 			
 		}
 		
-		for(Room r : allRoomsList) {						
-			if(busyR.contains(r.getNumber().get())) {
-
-				r.setBusy(true);
-				roomBusy(r);
-			}
-		}
-	}
-	
-	
-	public void selectRoom(Room room) {
-		
-		room.setOnMouseClicked(new EventHandler<MouseEvent>() {
-		    @Override
-		    public void handle(MouseEvent mouseEvent) {
-		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-		            if(mouseEvent.getClickCount() == 2){
-		    			clickRoom(room);
-		    			clickOpen();
-		            } else if (mouseEvent.getClickCount() == 1) {
-		    			clickRoom(room);
-
-		            }
-		        }
-		    }
-		});
-	}
-	
-	public void roomBusy(Room r) {
-		if(r.isBusy() == true) {
-			r.setBackground(new Background(
-					new BackgroundFill(Color.RED,
-							new CornerRadii(0),
-							new Insets(0))));
-
-		}
 	}
 	
 	public void clickRoom(Room room) {
@@ -390,60 +285,29 @@ public class RoomsController implements Initializable {
 		edit_b.setDisable(false);
 	}
 	
-	public void clickClearImg() {
-		file = null;
-		photo_x.setImage(null);
-	}
 	
-	public void setDisable(boolean disable) {
-		imageSelector_b.setDisable(disable);
-		clearImg_b.setDisable(disable);
-		roomNo_x.setDisable(disable);
-		category_x.setDisable(disable);
-		capacity_x.setDisable(disable);
-		ac_yes.setDisable(disable);
-		ac_no.setDisable(disable);
-		view_x.setDisable(disable);
-		smoking_yes.setDisable(disable);
-		smoking_no.setDisable(disable);
-		price_night_x.setDisable(disable);
-		currency_x.setDisable(disable);
-	}
-	
-	public  void refresh() {
+	public void clickSelectImage() {
 		
-		roomLayout.getChildren().clear();
-		roomLayout.getRowConstraints().clear();
-		allRoomsList.clear();
-		roomList.clear();
-		loadRooms();
+		FileChooser chooser = new FileChooser();
+	    chooser.setTitle("Select Image File");
 
-	}
+	    chooser.getExtensionFilters().addAll(
+	        new FileChooser.ExtensionFilter("Image Files",
+	            "*.png", "*.jpg", "*.jpeg"));
+
+	    file = chooser.showOpenDialog(null);
+		URL url;
+		
+		if(file != null){
 			
-	public void clickClear() {
-		setDisable(true);
-		
-		roomNo_x.clear();
-		category_x.setValue("");
-		capacity_x.clear();;
-		ac_yes.setSelected(false);
-		ac_no.setSelected(false);
-		view_x.setValue(null);
-		smoking_yes.setSelected(false);
-		smoking_no.setSelected(false);
-		price_night_x.clear();
-		footer_l.setText(null);
-		photo_x.setImage(null);
-		isBusy_l.setText(null);
-		
-		submit_b.setDisable(true);
-		clear_b.setDisable(true);
-		open_b.setDisable(true);
-		edit_b.setDisable(true);
-		delete_b.setDisable(true);
-		
-		refresh();
-
+			try {
+				url = file.toURI().toURL();
+				photo_x.setImage(new Image(url.toExternalForm()));
+				
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void clickSubmit() {
@@ -562,6 +426,9 @@ public class RoomsController implements Initializable {
 		    			alert.setHeaderText(null);
 		    			alert.setContentText("Room Updated Succesfully");
 		    			alert.showAndWait();
+		    			getActiveSelection().setText
+		    			( "ROOM:" +roomNo+"\n"
+		    					+ "Category: " + category);
 		    			clickRoom(getActiveSelection());
 						file = null;
 	        			
@@ -585,7 +452,178 @@ public class RoomsController implements Initializable {
 		}
 	}
 	
-     public void loadSelectedRoom(Room r) {
+	public void generalInitalValues() {
+		loadHouseKeepingButton();
+		loadCategories();
+		view_x.setItems(views);
+		currency_x.setItems(currencies);
+	}
+	
+	public Room getActiveSelection() {
+		return activeSelection;
+	}
+	
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		updateToday();
+		generalInitalValues();
+		setDisable(true);
+		tg.selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+		    if (newVal == null)
+		        oldVal.setSelected(true);
+		});
+		viewAllRooms_b.setSelected(true);
+		loadRooms();
+
+	}
+	
+	public void loadCategories() {
+ 		
+ 		try {
+ 			PreparedStatement loadCategories = 
+ 					Database.con().prepareStatement
+ 					("select * from hoteldatabase.roomcategories");
+ 			ResultSet rs = loadCategories.executeQuery();
+ 			
+ 			while(rs.next()) {
+ 				String roomCat = rs.getString("name");
+ 				
+ 				if(!categories.contains(roomCat)) {
+ 					categories.add(roomCat);
+ 					}
+ 				}
+ 			category_x.setItems(categories);
+ 			
+ 		} catch (SQLException e) {
+ 			e.printStackTrace();	
+ 		}
+
+ 	}
+	
+	public void loadHouseKeepingButton() {
+ 		
+			boolean answer = houseK_b.isVisible();			
+
+ 			
+ 			try {
+ 				
+ 				PreparedStatement checked = Database.con().prepareStatement
+ 						("SELECT housekeeping FROM hoteldatabase.configuratons;");
+ 				
+ 				ResultSet result = checked.executeQuery();
+ 				
+ 				while(result.next()) {
+ 					
+ 					 answer = result.getBoolean(1);			
+ 				}
+ 				
+ 			} catch (SQLException e) {
+ 				e.printStackTrace();
+ 			}
+ 				houseK_b.setVisible(answer);
+ 		}
+			
+	public void loadRooms() {
+		int rowInx = 0;
+		int columnInx = 0;
+		ResultSet resultSet = null;
+		Room room = null;
+		
+		
+		try {
+			PreparedStatement availableRooms = Database.con().prepareStatement
+			("SELECT *\r\n"
+			+ "FROM  hoteldatabase.rooms ro\r\n"
+			+ "LEFT JOIN hoteldatabase.reservations r\r\n"
+			+ "USING (number)\r\n"
+			+ "WHERE  ro.number NOT IN\r\n"
+			+ "(SELECT number FROM  hoteldatabase.rooms ro\r\n"
+			+ "LEFT JOIN hoteldatabase.reservations r\r\n"
+			+ "USING (number) WHERE NOT check_in > ? AND check_out > ?)\r\n"
+			+ "ORDER BY ro.number");
+			availableRooms.setDate(1,java.sql.Date.valueOf(todayDate));
+			availableRooms.setDate(2,java.sql.Date.valueOf(todayDate));
+			
+			PreparedStatement allRooms = Database.con().prepareStatement
+			( "SELECT *"
+			+ "FROM `hoteldatabase`.rooms ro\r\n"
+		    + "LEFT JOIN `hoteldatabase`.reservations r \r\n"
+			+ "ON ro.number = r.number \r\n"
+			+ "ORDER BY ro.number");
+			
+			if( viewAllRooms_b.isSelected()) {
+				resultSet = allRooms.executeQuery();
+			} 
+			else if( viewAvailableRooms_b.isSelected()) {
+					 resultSet = availableRooms.executeQuery();
+			}
+
+			while(resultSet.next()) {
+				
+				Date checkin = resultSet.getDate("check_in");
+			    Date checkout = resultSet.getDate("check_out");
+			    
+				int roomID = resultSet.getInt("id_room");
+				int roomNo = resultSet.getInt("number");
+				String category = resultSet.getString("category");
+			    int capacity = resultSet.getInt("capacity");
+			    String acValue = resultSet.getString("air_c");
+			    String view = resultSet.getString("view");
+			    String smokingValue = resultSet.getString("smoking");
+			    int price =  resultSet.getInt("price_night");
+			    String currency = resultSet.getString("currency");
+			    
+			    room = new Room (
+			    		roomID, roomNo, category,
+			    		capacity, acValue, view,
+			    		smokingValue, price, currency,
+			    		null);
+			    
+		    	if(checkin !=null || checkout !=null ) {
+		    		
+		    		if(checkin.toLocalDate().compareTo(todayDate) <=0 
+		    				&& todayDate.compareTo(checkout.toLocalDate()) < 0) {
+		    			busyR.add(roomNo);
+		    			}
+		    		}
+		    	
+			    if(!roomList.contains(roomNo)) {
+			    	selectRoom(room);
+			    	roomList.add(roomNo);
+			    	allRoomsList.add(room);
+			    	
+			    	if(rowInx == 0 && columnInx == 0 ) {
+			    		roomLayout.getRowConstraints().add(new RowConstraints(80));
+
+			    	}
+			    	
+			    	if (columnInx == roomLayout.getColumnCount()) {
+			    		columnInx = 0;
+			    		++rowInx;
+			    		RowConstraints row = new RowConstraints(80);
+			    		row.setFillHeight(true);
+			    		roomLayout.getRowConstraints().add(row);
+			    		
+			    	}
+			     	roomLayout.add(room, columnInx, rowInx);
+			    	columnInx++;
+			    }
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		for(Room r : allRoomsList) {						
+			if(busyR.contains(r.getNumber().get())) {
+
+				r.setBusy(true);
+				roomBusy(r);
+			}
+		}
+	}
+	
+	public void loadSelectedRoom(Room r) {
     	 photo_x.setImage(null);
     	 int room_number = r.getNumber().get();
     	 
@@ -608,6 +646,7 @@ public class RoomsController implements Initializable {
 			     String smokingValue = selectedRoom.getString("smoking");
 			     int price =  selectedRoom.getInt("price_night");
 			     String currency = selectedRoom.getString("currency");
+			     String status = selectedRoom.getString("status");
 			     Blob blob = selectedRoom.getBlob("photo");
 			     
 			     if(blob != null) {
@@ -631,6 +670,10 @@ public class RoomsController implements Initializable {
 			    		 }
 			     price_night_x.setText(price + "");
 			     currency_x.setValue(currency);
+			     
+			     if(houseK_b.isVisible()) {
+				     status_l.setText("Status: "+status);
+			     }
 
 			     
 			 }
@@ -648,85 +691,225 @@ public class RoomsController implements Initializable {
  			isBusy_l.setText("Room is free");;
 
     	 }
-}
-     
-     public boolean areEmpty() {
- 		if(roomNo_x.getText().trim().isEmpty()
- 				|| category_x.getValue().trim().isEmpty()
- 				|| capacity_x.getText().trim().isEmpty()
- 				|| view_x.getValue() == null
- 				|| price_night_x.getText().trim().isEmpty()
- 				|| currency_x.getValue() == null
- 				|| ac.getSelectedToggle() == null
- 				|| smoking.getSelectedToggle() == null)
- 		{
- 			return true;
- 		} 
- 		
- 		else {
- 			return false;
- 		}
- 		
- 	}
- 	
- 	
- 	public void loadCategories() {
- 		
- 		try {
- 			PreparedStatement loadCategories = 
- 					Database.con().prepareStatement
- 					("select * from hoteldatabase.roomcategories");
- 			ResultSet rs = loadCategories.executeQuery();
- 			
- 			while(rs.next()) {
- 				String roomCat = rs.getString("name");
- 				
- 				if(!categories.contains(roomCat)) {
- 					categories.add(roomCat);
- 					}
- 				}
- 			category_x.setItems(categories);
- 			
- 		} catch (SQLException e) {
- 			e.printStackTrace();	
- 		}
-
- 	}
- 	
- 	public void addCategoty(ComboBox<String> cb ) {
- 		
- 		String category = cb.getEditor().getText();
- 		
- 		if(!categories.contains(category)) {
- 			
- 			try {
- 				
- 				PreparedStatement newCategory = Database.con().prepareStatement
- 						("INSERT INTO `hoteldatabase`.`roomcategories` (`name`) VALUES ( ? );");
- 				newCategory.setString(1, category);				     
- 				newCategory.execute();
- 				} 
- 			
- 			catch (SQLException e) {
- 					e.printStackTrace();
-
- 			}
- 			
- 		}
- 		
- 	}
+    	 
+	}
 	
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-		generalInitalValues();
-		setDisable(true);
-		tg.selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
-		    if (newVal == null)
-		        oldVal.setSelected(true);
-		});
-		viewAllRooms_b.setSelected(true);
+     public void openConfigs() {
+		
+		Stage primaryStage =  (Stage) open_b.getScene().getWindow();
+		primaryStage.close();
+		
+		Stage stage = new Stage();
+		
+		try {
+			Parent root = FXMLLoader.load(getClass().getResource("/application/Configurations.fxml"));
+			Scene scene = new Scene(root);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+	        stage.setScene(scene);
+			stage.setScene(scene);
+			stage.show();
+			
+		} 
+		
+		catch(Exception ex) {
+			ex.printStackTrace();
+			
+		}
+	
+	}
+     
+     public void openHouseKeepingMng() {
+ 		
+		Stage primaryStage =  (Stage) open_b.getScene().getWindow();
+		primaryStage.close();
+		
+		Stage stage = new Stage();
+		
+	
+			Parent root;
+			try {
+				root = FXMLLoader.load(getClass().getResource("/application/Housekeeping.fxml"));
+				Scene scene = new Scene(root);
+				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		        stage.setScene(scene);
+				stage.setScene(scene);
+				stage.show();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+				
+			}
+     
+     }
+ 	
+ 	public void openReports() {
+		
+ 		Stage primaryStage =  (Stage) open_b.getScene().getWindow();
+		primaryStage.close();
+		
+		Stage stage = new Stage();
+	
+			Parent root;
+			try {
+				root = FXMLLoader.load(getClass().getResource("/application/DailyReport.fxml"));
+				Scene scene = new Scene(root);
+				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		        stage.setScene(scene);
+				stage.setScene(scene);
+				stage.show();
+			
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+ 	}
+ 	
+ 	public  void refresh() {
+		
+		roomLayout.getChildren().clear();
+		roomLayout.getRowConstraints().clear();
+		allRoomsList.clear();
+		roomList.clear();
 		loadRooms();
 
 	}
+ 	
+ 	public void roomBusy(Room r) {
+		if(r.isBusy() == true) {
+			r.setBackground(new Background(
+					new BackgroundFill(Color.RED,
+							new CornerRadii(0),
+							new Insets(0))));
+
+		}
+	}
+ 	
+ 	public void selectRoom(Room room) {
+		
+		room.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent mouseEvent) {
+		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+		            if(mouseEvent.getClickCount() == 2){
+		    			clickRoom(room);
+		    			clickOpen();
+		            } else if (mouseEvent.getClickCount() == 1) {
+		    			clickRoom(room);
+
+		            }
+		        }
+		    }
+		});
+	}
+ 	
+ 	public void setActiveSelection(Room active) {
+		this.activeSelection = active;
+	}		
+	
+	public void setDisable(boolean disable) {
+		imageSelector_b.setDisable(disable);
+		clearImg_b.setDisable(disable);
+		roomNo_x.setDisable(disable);
+		category_x.setDisable(disable);
+		capacity_x.setDisable(disable);
+		ac_yes.setDisable(disable);
+		ac_no.setDisable(disable);
+		view_x.setDisable(disable);
+		smoking_yes.setDisable(disable);
+		smoking_no.setDisable(disable);
+		price_night_x.setDisable(disable);
+		currency_x.setDisable(disable);
+	}
+	
+	public void updateToday() {
+		Boolean reset = houseK_b.isVisible();
+		Date day = null;
+		Date today = Date.valueOf(LocalDate.now());
+		
+		try {
+			
+			PreparedStatement getDate = Database.con().prepareStatement
+					("SELECT housekeeping, today FROM hoteldatabase.configuratons;");
+			
+			PreparedStatement setDate = Database.con().prepareStatement(
+					"UPDATE `hoteldatabase`.`configuratons`\r\n"
+					+ "SET `today` = ? \r\n"
+					+ "WHERE configID = '1';");
+			
+			PreparedStatement updateStatus = Database.con().prepareStatement
+					("UPDATE `hoteldatabase`.`rooms`\r\n"
+							+ "SET `status` = 'Dirty' \r\n"
+							+ "WHERE number IN (\r\n"
+							+ "SELECT number \r\n"
+							+ "FROM hoteldatabase.reservations\r\n"
+							+ "WHERE check_in <= ? AND check_out >= ? );");
+			
+			ResultSet result = getDate.executeQuery();
+			
+			while(result.next()) {
+				reset = result.getBoolean(1);
+				day = result.getDate(2);	
+			}
+			
+			if(!day.equals(today) && reset == true) {
+				
+				updateStatus.setDate(1, today);
+				updateStatus.setDate(2, today);
+				updateStatus.executeUpdate();
+				
+				setDate.setDate(1, today);
+				setDate.executeUpdate();
+				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+//	public void timer() {
+//        TimerService service = new TimerService();
+//        AtomicInteger count = new AtomicInteger(0);
+//        
+//        
+//        service.setCount(count.get());
+//        service.setPeriod(Duration.seconds(1));
+//        service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+//
+//            @Override
+//            public void handle(WorkerStateEvent t) { 
+//                if(LocalTime.now().isAfter(LocalTime.of(12, 00))){
+//            		System.out.println("Hi");
+//            		setRoomStatusDirty();
+//                    count.set((int) t.getSource().getValue());
+//            		service.cancel();
+//                } 		
+//            }
+//        });
+//        service.start();
+//		
+//	}
+	
+//    private static class TimerService extends ScheduledService<Integer> {
+//        private IntegerProperty count = new SimpleIntegerProperty();
+//
+//        public final void setCount(Integer value) {
+//            count.set(value);
+//        }
+//
+//        public final Integer getCount() {
+//            return count.get();
+//        }
+//
+//        protected Task<Integer> createTask() {
+//            return new Task<Integer>() {
+//                protected Integer call() {
+//                    //Adds 1 to the count
+//                    count.set(getCount() + 1);
+//                    return getCount();
+//                }
+//            };
+//        }
+//    }
 	
 	}

@@ -62,44 +62,48 @@ public class Room  extends Label {
 		this.status = new SimpleStringProperty(status);
 	}
 
-	public int getRoom_id() {
-		return room_id;
-	}
-
-	public SimpleIntegerProperty getNumber() {
-		return number;
-	}
-
-	public StringProperty getCategory() {
-		return category;
+	public String getAc() {
+		return ac.get();
 	}
 
 	public int getCapacity() {
 		return capacity.get();
 	}
 
-	public String getAc() {
-		return ac.get();
-	}
-
-	public String getView() {
-		return view.get();
-	}
-
-	public String getSmoking() {
-		return smoking.get();
-	}
-
-	public int getPrice() {
-		return price.get();
+	public StringProperty getCategory() {
+		return category;
 	}
 
 	public String getCurrency() {
 		return currency.get();
 	}
 
+	public SimpleIntegerProperty getNumber() {
+		return number;
+	}
+
 	public Image getPhoto() {
 		return photo;
+	}
+
+	public int getPrice() {
+		return price.get();
+	}
+
+	public int getRoom_id() {
+		return room_id;
+	}
+
+	public String getSmoking() {
+		return smoking.get();
+	}
+
+	public StringProperty getStatus() {
+		return status;
+	}
+
+	public String getView() {
+		return view.get();
 	}
 
 	public boolean isBusy() {
@@ -108,10 +112,6 @@ public class Room  extends Label {
 
 	public void setBusy(boolean busy) {
 		this.busy = busy;
-	}
-
-	public StringProperty getStatus() {
-		return status;
 	}
 	public void setStatus(String status) {
 		this.status = new SimpleStringProperty(status);
