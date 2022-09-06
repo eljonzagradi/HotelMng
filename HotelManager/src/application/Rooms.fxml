@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="770.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RoomsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="797.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.RoomsController">
    <children>
-      <ScrollPane fitToWidth="true" layoutX="14.0" layoutY="55.0" prefHeight="695.0" prefWidth="615.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="308.0" AnchorPane.topAnchor="55.0">
+      <ScrollPane fitToWidth="true" layoutX="14.0" layoutY="55.0" prefHeight="701.0" prefWidth="615.0" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="308.0" AnchorPane.topAnchor="55.0">
          <content>
             <GridPane fx:id="roomLayout" alignment="CENTER" hgap="5.0" vgap="5.0">
               <columnConstraints>
@@ -74,7 +74,7 @@
                   <Font name="System Bold Italic" size="13.0" />
                </font>
             </Label>
-            <Label layoutX="21.0" layoutY="274.0" prefHeight="40.0" prefWidth="110.0" text="Category:">
+            <Label layoutX="21.0" layoutY="274.0" prefHeight="40.0" prefWidth="110.0" text="Type:">
                <font>
                   <Font name="System Bold Italic" size="13.0" />
                </font>
@@ -139,8 +139,8 @@
          </children>
       </AnchorPane>
       <Button fx:id="delete_b" disable="true" layoutX="399.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="110.0" text="Delete Room" AnchorPane.rightAnchor="428.0" />
-      <Button fx:id="houseK_b" layoutX="643.0" layoutY="731.0" mnemonicParsing="false" onAction="#openHouseKeepingMng" prefHeight="25.0" prefWidth="132.0" text="Housekeeping Mng" />
-      <Button layoutX="791.0" layoutY="731.0" mnemonicParsing="false" onAction="#openReports" prefHeight="25.0" prefWidth="132.0" text="Reports" />
+      <Button fx:id="houseK_b" layoutX="175.0" layoutY="760.0" mnemonicParsing="false" onAction="#openHouseKeepingMng" prefHeight="25.0" prefWidth="132.0" text="Housekeeping Mng" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="175.0" />
+      <Button layoutX="13.0" layoutY="760.0" mnemonicParsing="false" onAction="#openReports" prefHeight="25.0" prefWidth="86.0" text="Reports" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="13.0" />
       <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#openConfigs" prefHeight="34.0" prefWidth="26.0">
          <graphic>
             <ImageView fitHeight="26.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
@@ -150,5 +150,6 @@
             </ImageView>
          </graphic>
       </Button>
+      <Button fx:id="rates_b" layoutX="108.0" layoutY="760.0" mnemonicParsing="false" onAction="#openRates" prefHeight="25.0" prefWidth="59.0" text="Rates" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="108.0" />
    </children>
 </AnchorPane>

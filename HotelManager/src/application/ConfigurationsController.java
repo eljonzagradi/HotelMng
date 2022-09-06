@@ -17,20 +17,27 @@ import javafx.stage.Stage;
 public class ConfigurationsController implements Initializable {
 	
 	@FXML private CheckBox checkHKM;
+	@FXML private CheckBox checkRateMng;
 	
 	public void updateConfigs() {
 		
-		boolean hkMng = checkHKM.isSelected();
+		boolean setHKMng = checkHKM.isSelected();
+		boolean setRateMng = checkRateMng.isSelected();
+
+		
 
 		try {
 			
 			PreparedStatement update = Database.con().prepareStatement
 					("UPDATE `hoteldatabase`.`configuratons`\r\n"
 							+ "SET\r\n"
-							+ "`housekeeping` = ? \r\n"
-							+ "WHERE `configID` = '1';");
+							+ "`housekeeping` = ? ,\r\n"
+							+ "`rateManagement` = ? \r\n"
+							+ "WHERE `configID` = '1';\r\n"
+							+ "");
 			
-			update.setBoolean(1, hkMng);
+			update.setBoolean(1, setHKMng);
+			update.setBoolean(2, setRateMng);
 			update.executeUpdate();
 		
 		} catch (SQLException e) {
@@ -41,36 +48,28 @@ public class ConfigurationsController implements Initializable {
 	
 	public void housekeepingMng() {
 		
-		int answer = -1;
+		boolean housekeeping = checkHKM.isSelected();
+		boolean rateMng = checkRateMng.isSelected();
+		
 		
 		try {
 			
 			PreparedStatement checked = Database.con().prepareStatement
-					("SELECT housekeeping FROM hoteldatabase.configuratons;");
+					("SELECT housekeeping , rateManagement FROM hoteldatabase.configuratons;");
 			
 			ResultSet result = checked.executeQuery();
 			
 			while(result.next()) {
 				
-				answer = result.getInt(1);			
+				housekeeping = result.getBoolean(1);
+				rateMng = result.getBoolean(2);
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		if(answer == 0) {
-			
-			checkHKM.setSelected(false);
-		
-		} else if(answer == 1) {
-			
-			checkHKM.setSelected(true);
-		
-		} else {
-			System.out.println("Something went wrong");	
-		}
-		
+			checkHKM.setSelected(housekeeping);
+			checkRateMng.setSelected(rateMng);
 	}
 	
 	public void clickSave() {

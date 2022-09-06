@@ -86,7 +86,7 @@ public class HousekeepingController implements Initializable {
 		try {
 			
 			PreparedStatement select = Database.con().prepareStatement
-					("SELECT number,category,status\r\n"
+					("SELECT number,type,status\r\n"
 					+ "FROM hoteldatabase.rooms;");
 			
 			ResultSet rs = select.executeQuery();
@@ -94,7 +94,7 @@ public class HousekeepingController implements Initializable {
 			while(rs.next()) {
 				
 				int number = rs.getInt("number");
-				String category = rs.getString("category");
+				String category = rs.getString("type");
 				String status = rs.getString("status");
 				
 				Room room = new Room(number, category, status);

@@ -42,9 +42,9 @@ import javafx.stage.Stage;
 public class CalendarController implements Initializable {
 	
 	public static int priceNight;
-    
-	public static int selectedRoom;
+  	public static int selectedRoom;
 	public static String tempCurrency;
+	
 	//Table FXML components:
     @FXML private TableView<Reservation> reservationsTable;
 	@FXML private TableColumn<Reservation,String> name_c;
@@ -56,6 +56,7 @@ public class CalendarController implements Initializable {
 	@FXML private TableColumn<Reservation,String> currency_c;
 	@FXML private TableColumn<Reservation,Timestamp> createdAt_c;
 	@FXML private TableColumn<Reservation,Number> phone_c;
+	
 	//Calendar FXML components:
 	@FXML private VBox view;
 	@FXML private GridPane calendar;
@@ -65,9 +66,11 @@ public class CalendarController implements Initializable {
     @FXML private Button nextMonth;
     
     @FXML private Text calendarTitle;
+    
     //Calendar variables:
     private ArrayList<DayNode> allCalendarDays = new ArrayList<>(35);
 	private YearMonth currentYearMonth;
+	
     //New Reservation FXML components:
 	@FXML private Label room_x;
     @FXML private TextField name_x;
@@ -81,6 +84,7 @@ public class CalendarController implements Initializable {
     @FXML private Button changeRoom_b;
     @FXML private Button deleteReservation;
     @FXML private TextField phonenum_x;
+    @FXML private ChoiceBox<String> rate_x;
     
 	@FXML private Label errorsDisplay;
 	@FXML private Button edit_b;
@@ -91,11 +95,12 @@ public class CalendarController implements Initializable {
 	@FXML private Label displayCurrency_l;
 	
 	//New Reservation variables:
-	ObservableList<String> currencies = FXCollections.observableArrayList("ALL", "EUR","USD","GPD");
+	ObservableList<String> currencies = FXCollections.observableArrayList("ALL"/* , "EUR","USD","GPD" */);
 	ObservableList<Reservation> reservations = FXCollections.observableArrayList();
 	ObservableList<LocalDate> busyDates = FXCollections.observableArrayList();
 	ObservableList<LocalDate> checkins = FXCollections.observableArrayList();
-
+	ObservableList<String> rateCategories = FXCollections.observableArrayList("No Selection");
+	ObservableList<Rate> ratesList = FXCollections.observableArrayList();
     ObservableList<LocalDate> temp = FXCollections.observableArrayList();
     List<LocalDate> listOfDates = null;
     Reservation activeReservation = null;
@@ -105,6 +110,61 @@ public class CalendarController implements Initializable {
 	private LocalDate  checkout;
 	private long totalPrice;
     private DayNode lastSelected = null;
+    
+    public void loadRates() {
+    	
+    	try {
+			
+			PreparedStatement rates = Database.con().prepareStatement
+					("SELECT * FROM hoteldatabase.categories;");
+			ResultSet getRates = rates.executeQuery();
+			
+			while(getRates.next()) {
+				
+				String cat = getRates.getString(1);
+				int price = getRates.getInt(2);
+				
+				ratesList.add(new Rate(cat,price));
+				rateCategories.add(cat);
+				
+			}
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+			}
+    	rate_x.setItems(null);
+    	rate_x.setItems(rateCategories);
+    	
+    }
+    
+    public void chooseRate() {
+    	
+    	rate_x.getSelectionModel().selectedItemProperty().addListener( e -> {
+    		
+    		String category = rate_x.getSelectionModel().getSelectedItem();
+    		
+    		if(category.equals("No Selection")){
+    			
+    			price_night_x.setText(Integer.toString(priceNight));
+    			
+    		} else {
+    		
+    		for(Rate r : ratesList) {
+    			
+    			if(r.getCategory().get().equals(category)) {
+    				
+    				price_night_x.setText(Integer.toString(r.getPrice().get()));
+    				break;
+    			}
+    			
+    		}
+    	}
+    		
+
+    		
+    	});
+    	
+    }
     
     public boolean areEmpty() {
 		
@@ -826,6 +886,8 @@ public class CalendarController implements Initializable {
 	}
     
     public void someInitalValues() {
+    	
+    	rate_x.getSelectionModel().select(0);
 		
 		price_night_x.textProperty().addListener( e -> {
 				setTotalPrice(calcPrice(getCheckin(),getCheckout()));
@@ -906,6 +968,8 @@ public class CalendarController implements Initializable {
    	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		loadRates();
+		chooseRate();
 		clickReservation();
 		tableSetup();
 		someInitalValues();

@@ -74,6 +74,7 @@ public class RoomsController implements Initializable {
 	@FXML private Button clear_b;
 	@FXML private Button clearImg_b;
 	@FXML private Button delete_b;
+	@FXML private Button rates_b;
 	
 	@FXML private ToggleButton viewAllRooms_b;
 	@FXML private ToggleButton viewAvailableRooms_b;
@@ -89,9 +90,9 @@ public class RoomsController implements Initializable {
 	
 	List<Integer> roomList = new ArrayList<Integer>();
 	List<Integer> busyR = new ArrayList<Integer>();
-	ObservableList<String> categories = FXCollections.observableArrayList();
+	ObservableList<String> types = FXCollections.observableArrayList();
 	ObservableList<String> views = FXCollections.observableArrayList("Mountain View", "Sea View", "City View" , "No View");
-	ObservableList<String> currencies = FXCollections.observableArrayList("ALL", "EUR","USD","GPD");
+	ObservableList<String> currencies = FXCollections.observableArrayList("ALL"/* , "EUR","USD","GPD" */);
 	ObservableList<Room> allRoomsList = FXCollections.observableArrayList();
 	LocalDate todayDate = LocalDate.now();
 	private Room activeSelection = null;
@@ -101,12 +102,12 @@ public class RoomsController implements Initializable {
  		
  		String category = cb.getEditor().getText();
  		
- 		if(!categories.contains(category)) {
+ 		if(!types.contains(category)) {
  			
  			try {
  				
  				PreparedStatement newCategory = Database.con().prepareStatement
- 						("INSERT INTO `hoteldatabase`.`roomcategories` (`name`) VALUES ( ? );");
+ 						("INSERT INTO `hoteldatabase`.`roomtypes` (`name`) VALUES ( ? );");
  				newCategory.setString(1, category);				     
  				newCategory.execute();
  				} 
@@ -315,7 +316,7 @@ public class RoomsController implements Initializable {
 		if(!areEmpty()) {
 			
 			int roomNo = Integer.parseInt(roomNo_x.getText());
-			String category = category_x.getValue();
+			String type = category_x.getValue();
 			int capacity = Integer.parseInt(capacity_x.getText());
 			RadioButton  selectedAc = (RadioButton) ac.getSelectedToggle();
 			String acValue = selectedAc.getText();
@@ -332,11 +333,11 @@ public class RoomsController implements Initializable {
 				try {
 					newRoom = Database.con().prepareStatement
 							("INSERT INTO `hoteldatabase`.`rooms` "
-							+ "(`number`, `category`, `capacity`, `air_c`, `view`, `smoking`, `price_night`, `currency`,`photo`) "
+							+ "(`number`, `type`, `capacity`, `air_c`, `view`, `smoking`, `price_night`, `currency`,`photo`) "
 							+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?,?);");
 					
 					newRoom.setInt(1, roomNo);
-					newRoom.setString(2, category);
+					newRoom.setString(2, type);
 					newRoom.setInt(3, capacity);
 					newRoom.setString(4, acValue);
 					newRoom.setString(5, view);
@@ -380,7 +381,7 @@ public class RoomsController implements Initializable {
 					updateRoom = Database.con().prepareStatement
 							("    UPDATE `hoteldatabase`.`rooms`\r\n"
 									+ "SET\r\n"
-									+ "`category` = ?,\r\n"
+									+ "`type` = ?,\r\n"
 									+ "`capacity` = ?,\r\n"
 									+ "`air_c` = ?,\r\n"
 									+ "`view` = ?,\r\n"
@@ -388,7 +389,7 @@ public class RoomsController implements Initializable {
 									+ "`price_night` = ?,\r\n"
 									+ "`currency` = ?\r\n"
 									+ "WHERE `number` = ?;");
-					updateRoom.setString(1, category);
+					updateRoom.setString(1, type);
 					updateRoom.setInt(2, capacity);
 					updateRoom.setString(3, acValue);
 					updateRoom.setString(4, view);
@@ -428,7 +429,7 @@ public class RoomsController implements Initializable {
 		    			alert.showAndWait();
 		    			getActiveSelection().setText
 		    			( "ROOM:" +roomNo+"\n"
-		    					+ "Category: " + category);
+		    					+ "Type: " + type);
 		    			clickRoom(getActiveSelection());
 						file = null;
 	        			
@@ -453,7 +454,7 @@ public class RoomsController implements Initializable {
 	}
 	
 	public void generalInitalValues() {
-		loadHouseKeepingButton();
+		loadConfigs();
 		loadCategories();
 		view_x.setItems(views);
 		currency_x.setItems(currencies);
@@ -477,22 +478,47 @@ public class RoomsController implements Initializable {
 
 	}
 	
+	public void openRates() {
+		
+//		Stage primaryStage =  (Stage) rates_b.getScene().getWindow();
+//		primaryStage.close();
+		
+		Stage stage = new Stage();
+		
+		try {
+			Parent root = FXMLLoader.load(getClass().getResource("/application/Rates.fxml"));
+			Scene scene = new Scene(root);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+	        stage.setScene(scene);
+			stage.setScene(scene);
+			stage.showAndWait();
+			
+		} 
+		
+		catch(Exception ex) {
+			ex.printStackTrace();
+			
+		}
+		
+		
+	}
+	
 	public void loadCategories() {
  		
  		try {
  			PreparedStatement loadCategories = 
  					Database.con().prepareStatement
- 					("select * from hoteldatabase.roomcategories");
+ 					("select * from hoteldatabase.roomtypes");
  			ResultSet rs = loadCategories.executeQuery();
  			
  			while(rs.next()) {
  				String roomCat = rs.getString("name");
  				
- 				if(!categories.contains(roomCat)) {
- 					categories.add(roomCat);
+ 				if(!types.contains(roomCat)) {
+ 					types.add(roomCat);
  					}
  				}
- 			category_x.setItems(categories);
+ 			category_x.setItems(types);
  			
  		} catch (SQLException e) {
  			e.printStackTrace();	
@@ -500,27 +526,30 @@ public class RoomsController implements Initializable {
 
  	}
 	
-	public void loadHouseKeepingButton() {
+	public void loadConfigs() {
  		
-			boolean answer = houseK_b.isVisible();			
+			boolean houseKeeping = houseK_b.isVisible();
+			boolean rates = rates_b.isVisible();
 
  			
  			try {
  				
  				PreparedStatement checked = Database.con().prepareStatement
- 						("SELECT housekeeping FROM hoteldatabase.configuratons;");
+ 						("SELECT housekeeping,rateManagement FROM hoteldatabase.configuratons;");
  				
  				ResultSet result = checked.executeQuery();
  				
  				while(result.next()) {
  					
- 					 answer = result.getBoolean(1);			
+ 					houseKeeping = result.getBoolean(1);
+ 					rates = result.getBoolean(2);
  				}
  				
  			} catch (SQLException e) {
  				e.printStackTrace();
  			}
- 				houseK_b.setVisible(answer);
+ 				houseK_b.setVisible(houseKeeping);
+ 				rates_b.setVisible(rates);
  		}
 			
 	public void loadRooms() {
@@ -565,7 +594,7 @@ public class RoomsController implements Initializable {
 			    
 				int roomID = resultSet.getInt("id_room");
 				int roomNo = resultSet.getInt("number");
-				String category = resultSet.getString("category");
+				String category = resultSet.getString("type");
 			    int capacity = resultSet.getInt("capacity");
 			    String acValue = resultSet.getString("air_c");
 			    String view = resultSet.getString("view");
@@ -639,7 +668,7 @@ public class RoomsController implements Initializable {
 			 while(selectedRoom.next()) {
 				 
 				 int roomNo = selectedRoom.getInt("number");
-				 String category = selectedRoom.getString("category");
+				 String category = selectedRoom.getString("type");
 			     int capacity = selectedRoom.getInt("capacity");
 			     String acValue = selectedRoom.getString("air_c");
 			     String view = selectedRoom.getString("view");
@@ -722,7 +751,6 @@ public class RoomsController implements Initializable {
  		
 		Stage primaryStage =  (Stage) open_b.getScene().getWindow();
 		primaryStage.close();
-		
 		Stage stage = new Stage();
 		
 	
